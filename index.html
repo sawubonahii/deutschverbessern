@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>互動式德文學習週計畫</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Cool Gray and Blue -->
+    <!-- Application Structure Plan: A single-page application with a top navigation bar for days of the week (Mon-Sun). Clicking a day dynamically updates a central content area to display that day's learning tasks in a card-based layout. This task-oriented, day-by-day view is more intuitive for a weekly schedule than a long table, preventing information overload and providing a clean, focused user experience. -->
+    <!-- Visualization & Content Choices: The weekly plan is organized by day. Goal: Inform/Guide. Method: Interactive daily view. A top navigation bar (HTML buttons) allows users to select a day. Interaction: Clicking a day triggers a JS function to update the main content area with that day's specific tasks, which are presented in styled cards (HTML/Tailwind). Justification: This approach turns a static table into a dynamic, user-driven experience, focusing the user's attention on one day at a time for better clarity. Library: Vanilla JS. CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .nav-btn {
+            transition: all 0.3s ease;
+        }
+        .nav-btn.active {
+            background-color: #2563eb;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .task-card, .vocab-card, .practice-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .task-card:hover, .vocab-card:hover, .practice-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .answer {
+            display: none;
+        }
+        .answer.show {
+            display: block;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <main class="w-full max-w-4xl bg-white rounded-2xl shadow-2xl p-6 md:p-10 mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800">德文學習週計畫 (Wochenplan zum Deutschlernen)</h1>
+            <p class="text-gray-500 mt-2">主題：Nina的夢想職業 - 兒童物理治療師 (Ninas Traumjob: Kinder-Physiotherapeutin)</p>
+            <a href="https://open.spotify.com/episode/44j4Pi16C3w6ym5GDMng5w?si=DFN6QFUJRNaahA8vPlTvwA" target="_blank" class="inline-flex items-center px-4 py-2 mt-4 text-sm font-medium text-blue-600 bg-blue-100 rounded-full hover:bg-blue-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm-2 14c-1.104 0-2-.896-2-2v-4c0-1.104.896-2 2-2s2 .896 2 2v4c0 1.104-.896 2-2 2zm4-2c-1.104 0-2-.896-2-2v-4c0-1.104.896-2 2-2s2 .896 2 2v4c0 1.104-.896 2-2 2z"/>
+                </svg>
+                點此收聽音檔 (Hier den Podcast anhören)
+            </a>
+        </header>
+
+        <nav class="flex flex-wrap justify-center gap-2 md:gap-3 mb-8">
+        </nav>
+
+        <div id="plan-content" class="mt-8">
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const planData = [
+                { 
+                    day: '一', 
+                    goal: '熟悉主題與核心詞彙', 
+                    tasks: {
+                        '聽': '聆聽課文第一段，理解Nina的工作日常概述。 (Hören Sie den ersten Absatz des Textes, um einen Überblick über Ninas Arbeitsalltag zu erhalten.)', 
+                        '說': '模仿Podcast中的語調和節奏，朗讀關於工作描述的句子。 (Imitieren Sie Tonfall und Rhythmus des Podcasts und lesen Sie Sätze zur Arbeitsbeschreibung laut vor.)', 
+                        '讀': '閱讀課文第一段，標註不熟悉的單字與句子。 (Lesen Sie den ersten Absatz des Textes und markieren Sie unbekannte Wörter und Sätze.)', 
+                        '寫': '寫下自己對「夢想職業」的看法，使用簡單德語。 (Schreiben Sie in einfachem Deutsch Ihre Meinung zu einem "Traumberuf" auf.)'
+                    },
+                    supplementary: {
+                        '單字': [
+                            { word: 'der Physiotherapeut', partOfSpeech: 'Nomen, maskulin', chinese: '物理治療師 (Physiotherapeut)', example: 'Der Physiotherapeut hilft mir, mein Bein nach dem Unfall zu bewegen.' },
+                            { word: 'die Kinderklinik', partOfSpeech: 'Nomen, feminin', chinese: '兒童醫院 (Kinderklinik)', example: 'Die Kinderklinik ist oft voller bunter Spielsachen.' },
+                            { word: 'der Patient', partOfSpeech: 'Nomen, maskulin', chinese: '病人 (Patient)', example: 'Der Arzt kümmert sich um seinen Patienten.' },
+                            { word: 'die Behandlung', partOfSpeech: 'Nomen, feminin', chinese: '治療 (Behandlung)', example: 'Die Behandlung hat sehr gut geholfen.' },
+                            { word: 'die Bewegung', partOfSpeech: 'Nomen, feminin', chinese: '動作 (Bewegung)', example: 'Für die Genesung ist viel Bewegung wichtig.' },
+                        ],
+                        '練習': [
+                            { question: '根據課文內容，Nina的工作地點主要在哪裡？(Wo arbeitet Nina hauptsächlich laut dem Text?)<br>A. In einer Praxis für Sportler<br>B. In einer großen Kinderklinik<br>C. In einer Gynäkologie<br>D. In einer Schule', type: '選擇題 (Multiple-Choice-Frage)', skill: '閱讀理解、細節掌握 (Leseverständnis, Detailverständnis)', answer: 'B. In einer großen Kinderklinik' },
+                            { question: 'Nina arbeitet als ________ in einer Kinderklinik.', type: '填空題 (Lückentext)', skill: '詞彙應用 (Vokabular-Anwendung)', answer: 'Physiotherapeutin' },
+                            { question: 'Was ist Ninas Traumberuf?', type: '簡答題 (Kurzfrage)', skill: '理解主旨 (Hauptgedanken verstehen)', answer: 'Kinder-Physiotherapeutin' },
+                            { question: '請用「Kinderklinik」造句。(Bilden Sie einen Satz mit "Kinderklinik".)', type: '造句 (Satzbildung)', skill: '造句、文法應用 (Satzstruktur, Grammatik)', answer: 'In der Kinderklinik gibt es viele kranke Kinder.' },
+                            { question: '下列哪一個詞彙不是與醫院相關？(Welches der folgenden Wörter hat keinen Bezug zum Krankenhaus?)<br>A. der Arzt<br>B. die Schwester<br>C. die Schule<br>D. der Patient', type: '選擇題 (Multiple-Choice-Frage)', skill: '詞彙辨識 (Vokabular-Erkennung)', answer: 'C. die Schule' },
+                        ]
+                    }
+                },
+                { 
+                    day: '二', 
+                    goal: '理解醫院工作環境', 
+                    tasks: {
+                        '聽': '聆聽Nina描述她在大學附屬兒童醫院的工作環境與服務對象。 (Hören Sie, wie Nina ihr Arbeitsumfeld und ihre Patienten in der Universitäts-Kinderklinik beschreibt.)', 
+                        '說': '練習用德文描述「醫院裡的哪些人或工作內容讓你感到敬佩？」 (Üben Sie auf Deutsch zu beschreiben: "Welche Personen oder Aufgaben im Krankenhaus bewundern Sie?")', 
+                        '讀': '閱讀Nina描述醫院工作內容的段落，並劃出相關專業詞彙。 (Lesen Sie den Abschnitt, in dem Nina ihre Arbeit im Krankenhaus beschreibt, und markieren Sie relevante Fachbegriffe.)', 
+                        '寫': '查閱並寫下不同醫療專業人員的德文名稱。 (Recherchieren und schreiben Sie die deutschen Bezeichnungen für verschiedene medizinische Fachkräfte auf.)' 
+                    },
+                    supplementary: {
+                        '單字': [
+                            { word: 'das Frühchen', partOfSpeech: 'Nomen, neutrum', chinese: '早產兒 (Frühchen)', example: 'Das Frühchen braucht besondere Pflege und Aufmerksamkeit.' },
+                            { word: 'die Atmung', partOfSpeech: 'Nomen, feminin', chinese: '呼吸 (Atmung)', example: 'Die Physiotherapeutin hilft den Patienten bei der Atmung.' },
+                            { word: 'die Therapie', partOfSpeech: 'Nomen, feminin', chinese: '治療 (Therapie)', example: 'Die Therapie hat gute Fortschritte gemacht.' },
+                            { word: 'die Intensivstation', partOfSpeech: 'Nomen, feminin', chinese: '加護病房 (Intensivstation)', example: 'Das Frühchen liegt auf der Intensivstation.' },
+                            { word: 'speziell', partOfSpeech: 'Adjektiv', chinese: '特別的 (speziell)', example: 'Die Uniklinik hat sich auf spezielle Fälle spezialisiert.' },
+                        ],
+                        '練習': [
+                            { question: '寫出3個你認為在醫院會遇到的專業人士，並用德文描述他們的工作。(Nennen Sie 3 Berufe, denen Sie im Krankenhaus begegnen könnten, und beschreiben Sie ihre Aufgaben auf Deutsch.)', type: '造句 (Satzbildung)', skill: '詞彙應用、句子結構 (Vokabular-Anwendung, Satzstruktur)', answer: '參考答案會因人而異。 (Die Antwort kann je nach Person variieren.)' },
+                            { question: 'In der Intensivstation arbeiten die Ärzte und die Pfleger zusammen, um sich um die __________ zu kümmern.', type: '填空題 (Lückentext)', skill: '閱讀理解 (Leseverständnis)', answer: 'Frühchen' },
+                            { question: 'Nina arbeitet mit Erwachsenen.', type: '是非題 (Richtig/Falsch-Frage)', skill: '細節掌握 (Detailverständnis)', answer: 'Falsch (Falsch)' },
+                            { question: 'Was ist Ninas Traumberuf?', type: '簡答題 (Kurzfrage)', skill: '理解主旨 (Hauptgedanken verstehen)', answer: 'Kinder-Physiotherapeutin' },
+                            { question: '在文中，提到哪種病人需要特別照顧？(Welche Art von Patienten wird im Text als besonders pflegebedürftig erwähnt?)<br>A. Erwachsene<br>B. Teenager<br>C. Frühchen<br>D. Sportler', type: '選擇題 (Multiple-Choice-Frage)', skill: '閱讀理解、細節掌握 (Leseverständnis, Detailverständnis)', answer: 'C. Frühchen' },
+                        ]
+                    }
+                },
+                { 
+                    day: '三', 
+                    goal: '學習動詞與形容詞的應用', 
+                    tasks: {
+                        '聽': '聆聽Nina提及的各式治療方法和病童狀況。 (Hören Sie sich die verschiedenen Behandlungsmethoden und Patientenzustände an, die Nina erwähnt.)', 
+                        '說': '根據課文內容，用德文簡述「物理治療師」的工作特點。 (Fassen Sie basierend auf dem Text die Merkmale der Arbeit eines "Physiotherapeuten" auf Deutsch zusammen.)', 
+                        '讀': '閱讀關於「Atemtherapie」（呼吸治療）和「Mobilisation」（活動）的段落，理解動詞應用。 (Lesen Sie die Absätze über "Atemtherapie" und "Mobilisation", um die Anwendung der Verben zu verstehen.)', 
+                        '寫': '寫下3-5個描述工作或感受的德文句子。 (Schreiben Sie 3-5 deutsche Sätze, die Ihre Arbeit oder Gefühle beschreiben.)'
+                    },
+                    supplementary: {
+                        '單字': [
+                            { word: 'mobilisieren', partOfSpeech: 'Verb', chinese: '活動；動員 (mobilisieren; aktivieren)', example: 'Die Krankenschwester muss den Patienten mobilisieren.' },
+                            { word: 'die Lungenentzündung', partOfSpeech: 'Nomen, feminin', chinese: '肺炎 (Lungenentzündung)', example: 'Eine Lungenentzündung kann sehr gefährlich sein.' },
+                            { word: 'die Muskulatur', partOfSpeech: 'Nomen, feminin', chinese: '肌肉組織 (Muskulatur)', example: 'Starke Muskulatur hilft, den Körper zu stützen.' },
+                            { word: 'die Prophylaxe', partOfSpeech: 'Nomen, feminin', chinese: '預防 (Prophylaxe)', example: 'Atemtherapie ist eine gute Prophylaxe gegen Lungenentzündung.' },
+                            { word: 'zerbrechlich', partOfSpeech: 'Adjektiv', chinese: '脆弱的 (zerbrechlich)', example: 'Die Frühchen sind sehr zerbrechlich.' },
+                        ],
+                        '練習': [
+                            { question: '下面的德文句子有語法錯誤，請改正。(Korrigieren Sie den Grammatikfehler im folgenden deutschen Satz.)<br>Der Physiotherapeut arbeitet mit viele verschiedene Patienten.', type: '改錯題 (Korrekturaufgabe)', skill: '語法修正、格位使用 (Grammatik-Korrektur, Kasus-Anwendung)', answer: 'Der Physiotherapeut arbeitet mit vielen verschiedenen Patienten. (mit + Dativ)' },
+                            { question: 'Die Atemtherapie hilft, eine __________ zu verhindern.', type: '填空題 (Lückentext)', skill: '詞彙應用 (Vokabular-Anwendung)', answer: 'Lungenentzündung' },
+                            { question: 'Die kleinen Kinder sind sehr zerbrechlich.', type: '改錯題 (Korrekturaufgabe)', skill: '語法修正 (Grammatik-Korrektur)', answer: '此句子沒有語法錯誤。 (Der Satz ist grammatikalisch korrekt.)' },
+                            { question: 'Was bedeutet "Mobilisation"?', type: '簡答題 (Kurzfrage)', skill: '定義理解 (Definitionen verstehen)', answer: 'Die Patienten zum Bewegen animieren.' },
+                            { question: 'Nina的工作包含哪一項？(Welche der folgenden Aufgaben gehört zu Ninas Arbeit?)<br>A. 烹飪 (Kochen)<br>B. 呼吸治療 (Atemtherapie)<br>C. 開車 (Autofahren)<br>D. 寫程式 (Programmieren)', type: '選擇題 (Multiple-Choice-Frage)', skill: '閱讀理解 (Leseverständnis)', answer: 'B. 呼吸治療 (Atemtherapie)' },
+                        ]
+                    }
+                },
+                { 
+                    day: '四', 
+                    goal: '掌握口語表達的固定句型', 
+                    tasks: {
+                        '聽': '聆聽Anni與Nina的對話，留意他們如何使用轉折語與固定句型。 (Hören Sie Anni und Ninas Gespräch und achten Sie darauf, wie sie Übergangswörter und feste Redewendungen verwenden.)', 
+                        '說': '挑選課文中喜歡的固定句型，並練習用自己的話造句。 (Wählen Sie eine feste Redewendung aus dem Text aus und üben Sie, sie in eigenen Sätzen zu verwenden.)', 
+                        '讀': '閱讀對話中關於「Was macht ihr mit dem?」（你們對他們做了什麼？）的問答，掌握提問與回答的結構。 (Lesen Sie den Frage-und-Antwort-Teil des Gesprächs über "Was macht ihr mit dem?", um die Struktur von Fragen und Antworten zu verstehen.)', 
+                        '寫': '寫一篇短文，描述與朋友討論職業選擇的對話。 (Schreiben Sie einen kurzen Text über ein Gespräch mit einem Freund über die Berufswahl.)'
+                    },
+                    supplementary: {
+                        '單字': [
+                            { word: 'der Arbeitsalltag', partOfSpeech: 'Nomen, maskulin', chinese: '日常工作；工作日常 (Arbeitsalltag)', example: 'Der Arbeitsalltag von Nina ist sehr abwechslungsreich.' },
+                            { word: 'ins Boot holen', partOfSpeech: 'Idiom', chinese: '讓某人參與；拉攏 (jemanden ins Boot holen)', example: 'Wir müssen die Eltern ins Boot holen, um dem Kind zu helfen.' },
+                            { word: 'der Austausch', partOfSpeech: 'Nomen, maskulin', chinese: '交流 (Austausch)', example: 'Der Austausch mit Kollegen ist sehr wichtig.' },
+                            { word: 'die Herausforderung', partOfSpeech: 'Nomen, feminin', chinese: '挑戰 (Herausforderung)', example: 'Die Arbeit ist eine große Herausforderung.' },
+                            { word: 'die Kommunikation', partOfSpeech: 'Nomen, feminin', chinese: '溝通 (Kommunikation)', example: 'Gute Kommunikation ist der Schlüssel zum Erfolg.' },
+                        ],
+                        '練習': [
+                            { question: '請模擬你是一位物理治療師，向一位家長解釋「Mobilisation」的重要性，並說明這對孩子有什麼幫助。(Stellen Sie sich vor, Sie sind ein Physiotherapeut, und erklären Sie einem Elternteil die Bedeutung der "Mobilisation" und wie sie dem Kind hilft.)', type: '口說模擬 (Sprechsimulation)', skill: '口語表達、溝通技巧 (Mündliche Ausdrucksfähigkeit, Kommunikationsfähigkeiten)', answer: '"Mobilisation ist sehr wichtig, damit das Kind keine Muskulatur verkürzt und möglichst wenig im Bett liegt. Es hilft dem Kind, sich wieder zu bewegen und gesund zu werden."' },
+                            { question: 'Nina findet ihre Arbeit langweilig.', type: '是非題 (Richtig/Falsch-Frage)', skill: '閱讀理解 (Leseverständnis)', answer: 'Falsch (Falsch)' },
+                            { question: 'Was macht Nina, um mit den Eltern zusammenzuarbeiten?', type: '簡答題 (Kurzfrage)', skill: '細節掌握 (Detailverständnis)', answer: 'Sie holt die Eltern "ins Boot".' },
+                            { question: '請用「Herausforderung」造句。(Bilden Sie einen Satz mit "Herausforderung".)', type: '造句 (Satzbildung)', skill: '詞彙應用 (Vokabular-Anwendung)', answer: 'Die Arbeit als Physiotherapeutin ist eine große Herausforderung.' },
+                            { question: '「Arbeitsalltag」這個詞的意思是？(Was bedeutet das Wort "Arbeitsalltag"?)<br>A. 假期 (Urlaub)<br>B. 夢想 (Traum)<br>C. 日常工作 (Alltägliche Arbeit)<br>D. 休息 (Pause)', type: '選擇題 (Multiple-Choice-Frage)', skill: '詞彙辨識 (Vokabular-Erkennung)', answer: 'C. 日常工作 (Alltägliche Arbeit)' },
+                        ]
+                    }
+                },
+                { 
+                    day: '五', 
+                    goal: '綜合應用與挑戰練習', 
+                    tasks: {
+                        '聽': '再次完整聆聽Podcast，檢視自己的理解程度。 (Hören Sie sich den Podcast noch einmal an, um Ihr Verständnis zu überprüfen.)', 
+                        '說': '嘗試不看課文，用德文口述Nina的職業內容。 (Versuchen Sie, Ninas Beruf auf Deutsch mündlich zusammenzufassen, ohne in den Text zu schauen.)', 
+                        '讀': '閱讀課文最後一段，了解對Podcast的總結與建議。 (Lesen Sie den letzten Absatz des Textes, um die Zusammenfassung und Empfehlungen des Podcasts zu verstehen.)', 
+                        '寫': '嘗試寫信給Nina，感謝她的分享並提出一個問題。 (Versuchen Sie, einen Brief an Nina zu schreiben, um ihr für das Teilen zu danken und eine Frage zu stellen.)'
+                    },
+                    supplementary: {
+                        '單字': [
+                            { word: 'Hospitalisiert sein', partOfSpeech: 'Redewendung', chinese: '住院 (hospitalisiert sein)', example: 'Manche Kinder sind so hospitalisiert, dass sie Angst vor neuen Gesichtern haben.' },
+                            { word: 'die Angst', partOfSpeech: 'Nomen, feminin', chinese: '害怕 (Angst)', example: 'Die Angst vor dem Unbekannten ist oft groß.' },
+                            { word: 'sich trauen', partOfSpeech: 'Verb', chinese: '敢於 (sich trauen)', example: 'Man muss sich trauen, neue Dinge auszuprobieren.' },
+                            { word: 'erklären', partOfSpeech: 'Verb', chinese: '解釋 (erklären)', example: 'Nina erklärt den Kindern, was sie tun wird.' },
+                            { word: 'der Fall', partOfSpeech: 'Nomen, maskulin', chinese: '案例 (Fall)', example: 'Nina arbeitet mit vielen speziellen Fällen.' },
+                        ],
+                        '練習': [
+                            { question: '請將以下德文單字或片語重新排列，組成一個符合課文內容的正確句子。(Ordnen Sie die folgenden deutschen Wörter oder Phrasen neu an, um einen korrekten Satz zu bilden, der dem Text entspricht.)<br>arbeiten / wir / in / Uniklinik / der / weil / wir / spezielle Fälle / haben', type: '句型重組 (Satzumstellung)', skill: '句子重組、文法應用 (Satzumbau, Grammatik-Anwendung)', answer: 'Wir arbeiten in der Uniklinik, weil wir spezielle Fälle haben.' },
+                            { question: 'Manche Kinder haben __________ vor neuen Gesichtern.', type: '填空題 (Lückentext)', skill: '詞彙應用 (Vokabular-Anwendung)', answer: 'Angst' },
+                            { question: 'Nina arbeitet只和簡單的案例工作.', type: '是非題 (Richtig/Falsch-Frage)', skill: '細節掌握 (Detailverständnis)', answer: 'Falsch (Falsch)' },
+                            { question: 'Wie kann man das Vertrauen der Kinder gewinnen?', type: '簡答題 (Kurzfrage)', skill: '理解主旨 (Hauptgedanken verstehen)', answer: 'Indem man ihnen alles erklärt und ihnen Zeit gibt.' },
+                            { question: '請解釋「Hospitalisiert sein」的意思。(Erklären Sie die Bedeutung von "Hospitalisiert sein".)', type: '口說模擬 (Sprechsimulation)', skill: '口語表達、定義理解 (Mündliche Ausdrucksfähigkeit, Definitionen verstehen)', answer: 'Hospitalisiert sein bedeutet, dass man lange im Krankenhaus war und sich an die Umgebung gewöhnt hat.' },
+                        ]
+                    }
+                },
+                { 
+                    day: '六', 
+                    goal: '單字與句型總複習 (Wiederholung von Vokabular und Satzstrukturen)', 
+                    tasks: {
+                        '聽': '複習本週單字與固定句型，利用錄音功能檢查發音。 (Wiederholen Sie die Vokabeln und festen Redewendungen der Woche und überprüfen Sie Ihre Aussprache mit der Aufnahmefunktion.)', 
+                        '說': '模擬面試，用德文回答「你為什麼想做這份工作？」。 (Simulieren Sie ein Vorstellungsgespräch und antworten Sie auf Deutsch auf die Frage: "Warum möchten Sie diesen Job machen?")', 
+                        '讀': '再次閱讀課文，嘗試不查閱詞典就能理解大部分內容。 (Lesen Sie den Text erneut und versuchen Sie, den Großteil des Inhalts ohne Wörterbuch zu verstehen.)', 
+                        '寫': '寫下本週學習心得與下週學習目標。 (Schreiben Sie Ihre Lernerfahrungen dieser Woche und Ihre Lernziele für die nächste Woche auf.)'
+                    },
+                    supplementary: {
+                        '單字': [],
+                        '練習': []
+                    }
+                },
+                { 
+                    day: '日', 
+                    goal: '休息與自我評量 (Ruhe und Selbsteinschätzung)', 
+                    tasks: {
+                        '聽': '聽德文歌曲或看德文影片，輕鬆接觸德文。 (Hören Sie deutsche Lieder oder schauen Sie deutsche Videos, um sich entspannt mit der Sprache zu beschäftigen.)', 
+                        '說': '自由聊天，嘗試將本週學到的詞彙和句型融入對話。 (Führen Sie ein freies Gespräch und versuchen Sie, die in dieser Woche gelernten Vokabeln und Redewendungen zu integrieren.)', 
+                        '讀': '閱讀德文新聞或短篇故事，擴大閱讀範圍。 (Lesen Sie deutsche Nachrichten oder Kurzgeschichten, um Ihren Leseumfang zu erweitern.)', 
+                        '寫': '寫下本週最喜歡的一個德文詞彙或句子，並說明原因。 (Schreiben Sie Ihr liebstes deutsches Wort oder Ihren liebsten Satz der Woche auf und begründen Sie, warum.)'
+                    },
+                    supplementary: {
+                        '單字': [],
+                        '練習': []
+                    }
+                }
+            ];
+
+            const navContainer = document.querySelector('nav');
+            const contentContainer = document.getElementById('plan-content');
+
+            const taskIcons = {
+                '聽': '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>',
+                '說': '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>',
+                '讀': '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v11.494m-9-5.494h18M5.454 6.253L3 12m18 0l-2.454-5.747M5.454 17.747L3 12m18 0l-2.454 5.747M12 6.253v11.494" /></svg>',
+                '寫': '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>',
+                '單字': '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>',
+                '練習': '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>'
+            };
+            
+            const taskColors = {
+                '聽': 'bg-sky-500',
+                '說': 'bg-amber-500',
+                '讀': 'bg-emerald-500',
+                '寫': 'bg-rose-500',
+                '單字': 'bg-violet-500',
+                '練習': 'bg-teal-500'
+            };
+
+            function displayPlan(dayIndex) {
+                const dayData = planData[dayIndex];
+                
+                let contentHTML = `
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl font-bold text-blue-600">週${dayData.day}：${dayData.goal}</h2>
+                        <p class="text-lg text-gray-500 mt-2">核心任務 (聽、說、讀、寫)</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                `;
+                
+                for (const [taskType, taskDescription] of Object.entries(dayData.tasks)) {
+                    contentHTML += `
+                        <div class="task-card bg-white rounded-xl shadow-lg overflow-hidden flex items-start p-5">
+                            <div class="flex-shrink-0 w-16 h-16 rounded-full ${taskColors[taskType]} flex items-center justify-center mr-5">
+                                ${taskIcons[taskType]}
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-700">${taskType} (${taskType === '聽' ? 'Hören' : taskType === '說' ? 'Sprechen' : taskType === '讀' ? 'Lesen' : 'Schreiben'})</h3>
+                                <p class="text-gray-600 mt-1">${taskDescription}</p>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                contentHTML += `</div>`;
+
+                if (dayData.supplementary && (dayData.supplementary['單字'].length > 0 || dayData.supplementary['練習'].length > 0)) {
+                    contentHTML += `
+                        <div class="text-center mb-8">
+                            <p class="text-lg text-gray-500 mt-4"></p>
+                        </div>
+                    `;
+
+                    if (dayData.supplementary['單字'].length > 0) {
+                        contentHTML += `
+                            <h3 class="text-xl font-bold text-violet-600 mb-4 flex items-center">
+                                <span class="w-10 h-10 rounded-full bg-violet-500 flex items-center justify-center mr-2">${taskIcons['單字']}</span>
+                                單字與活用卡 (Vokabel- und Anwendungskarten)
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                        `;
+                        dayData.supplementary['單字'].forEach(item => {
+                            contentHTML += `
+                                <div class="vocab-card bg-violet-50 border border-violet-200 rounded-lg p-4">
+                                    <h4 class="text-lg font-bold text-violet-800">${item.word}</h4>
+                                    <p class="text-sm text-violet-600 mb-2">${item.partOfSpeech}｜${item.chinese}</p>
+                                    <p class="text-gray-600 text-sm">例句: ${item.example}</p>
+                                </div>
+                            `;
+                        });
+                        contentHTML += `</div>`;
+                    }
+                    
+                    if (dayData.supplementary['練習'].length > 0) {
+                        contentHTML += `
+                            <h3 class="text-xl font-bold text-teal-600 mb-4 flex items-center">
+                                <span class="w-10 h-10 rounded-full bg-teal-500 flex items-center justify-center mr-2">${taskIcons['練習']}</span>
+                                練習題 (Übungsaufgaben)
+                            </h3>
+                            <div class="space-y-4">
+                        `;
+                        dayData.supplementary['練習'].forEach((item, index) => {
+                            contentHTML += `
+                                <div class="practice-card bg-teal-50 border border-teal-200 rounded-lg p-4">
+                                    <h4 class="text-lg font-semibold text-teal-800">題型: ${item.type} <span class="text-sm font-normal text-gray-500">（技能重點: ${item.skill}）</span></h4>
+                                    <p class="text-gray-700 mt-2">${item.question}</p>
+                                    <button onclick="document.getElementById('answer-${dayIndex}-${index}').classList.toggle('show')" class="mt-4 px-4 py-2 bg-teal-500 text-white rounded-md hover:bg-teal-600">顯示答案 (Antwort anzeigen)</button>
+                                    <div id="answer-${dayIndex}-${index}" class="answer bg-teal-100 border border-teal-300 rounded-md mt-4 p-3">
+                                        <p class="font-bold text-teal-800">參考答案: (Musterantwort:)</p>
+                                        <p class="text-gray-700 mt-1">${item.answer}</p>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        contentHTML += `</div>`;
+                    }
+                }
+
+                contentContainer.innerHTML = contentHTML;
+
+                document.querySelectorAll('.nav-btn').forEach((btn, index) => {
+                    btn.classList.toggle('active', index === dayIndex);
+                });
+            }
+
+            planData.forEach((item, index) => {
+                const button = document.createElement('button');
+                button.textContent = `週${item.day}`;
+                button.className = 'nav-btn px-4 py-2 rounded-full font-semibold text-gray-600 bg-gray-200 hover:bg-blue-500 hover:text-white';
+                button.addEventListener('click', () => displayPlan(index));
+                navContainer.appendChild(button);
+            });
+
+            displayPlan(0);
+        });
+    </script>
+</body>
+</html>
