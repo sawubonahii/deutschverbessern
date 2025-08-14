@@ -1,405 +1,457 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>互動式德文學習週計畫</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Cool Gray and Blue -->
-    <!-- Application Structure Plan: A single-page application with a top navigation bar for days of the week (Mon-Sun). Clicking a day dynamically updates a central content area to display that day's learning tasks in a card-based layout. This task-oriented, day-by-day view is more intuitive for a weekly schedule than a long table, preventing information overload and providing a clean, focused user experience. -->
-    <!-- Visualization & Content Choices: The weekly plan is organized by day. Goal: Inform/Guide. Method: Interactive daily view. A top navigation bar (HTML buttons) allows users to select a day. Interaction: Clicking a day triggers a JS function to update the main content area with that day's specific tasks, which are presented in styled cards (HTML/Tailwind). Justification: This approach turns a static table into a dynamic, user-driven experience, focusing the user's attention on one day at a time for better clarity. Library: Vanilla JS. -->
-    <style>
-        body {
-            font-family: 'Inter', 'Noto Sans TC', sans-serif;
-            background-color: #f3f4f6;
-        }
-        .nav-btn {
-            transition: all 0.3s ease;
-        }
-        .nav-btn.active {
-            background-color: #2563eb;
-            color: white;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-        }
-        .task-card, .vocab-card, .practice-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .task-card:hover, .vocab-card:hover, .practice-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-        }
-        .answer {
-            display: none;
-        }
-        .answer.show {
-            display: block;
-        }
-    </style>
-</head>
-<body class="flex items-center justify-center min-h-screen p-4">
+import { useState, useEffect } from 'react';
+import { Mic, Book, Pen, CheckSquare, MessageSquare, Search, Lightbulb, Zap, Award, BarChart3, Rocket, ArrowRight } from 'lucide-react';
+import React from 'react';
 
-    <main class="w-full max-w-4xl bg-white rounded-2xl shadow-2xl p-6 md:p-10 mx-auto">
-        <header class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-800">德文學習週計畫 (Wochenplan zum Deutschlernen)</h1>
-            <p class="text-gray-500 mt-2">主題：Nina的夢想職業 - 兒童物理治療師 (Ninas Traumjob: Kinder-Physiotherapeutin)</p>
-            <a href="https://open.spotify.com/episode/44j4Pi16C3w6ym5GDMng5w?si=DFN6QFUJRNaahA8vPlTvwN" target="_blank" class="inline-flex items-center px-4 py-2 mt-4 text-sm font-medium text-blue-600 bg-blue-100 rounded-full hover:bg-blue-200">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm-2 14c-1.104 0-2-.896-2-2v-4c0-1.104.896-2 2-2s2 .896 2 2v4c0 1.104-.896 2-2 2zm4-2c-1.104 0-2-.896-2-2v-4c0-1.104.896-2 2-2s2 .896 2 2v4c0 1.104-.896 2-2 2z"/>
-                </svg>
-                點此收聽音檔 (Hier den Podcast anhören)
-            </a>
-        </header>
+// Main App component
+export default function App() {
+    const [currentDayIndex, setCurrentDayIndex] = useState(0);
+    const [openExercises, setOpenExercises] = useState({});
 
-        <nav class="flex flex-wrap justify-center gap-2 md:gap-3 mb-8">
-        </nav>
-
-        <div id="plan-content" class="mt-8">
-        </div>
-    </main>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const planData = [
-                { 
-                    day: '一', 
-                    goal: '熟悉主題與核心詞彙 (Kennenlernen des Themas und der Kernvokabeln)', 
-                    tasks: [
-                        { type: '聽', description: '聆聽課文第一段，理解Nina的工作日常概述。 (Hören Sie den ersten Absatz des Textes, um einen Überblick über Ninas Arbeitsalltag zu erhalten.)', sampleAnswer: '主要是在大學附屬兒童醫院工作，幫助病童進行物理治療。 (Sie arbeitet hauptsächlich in einer Universitäts-Kinderklinik und hilft kranken Kindern mit Physiotherapie.)' },
-                        { type: '說', description: '模仿Podcast中的語調和節奏，朗讀關於工作描述的句子。 (Imitieren Sie Tonfall und Rhythmus des Podcasts und lesen Sie Sätze zur Arbeitsbeschreibung laut vor.)', sampleAnswer: '可練習朗讀以下句子：「Mein Traumjob ist es, als Physiotherapeutin in einer Kinderklinik zu arbeiten.」' },
-                        { type: '讀', description: '閱讀課文第一段，標註不熟悉的單字與句子。 (Lesen Sie den ersten Absatz des Textes, um unbekannte Wörter und Sätze zu markieren.)', sampleAnswer: '請務必標註以下單字：Physiotherapeut, Kinderklinik, Patient, Behandlung, Bewegung。' },
-                        { type: '寫', description: '寫下自己對「夢想職業」的看法，使用簡單德語。 (Schreiben Sie in einfachem Deutsch Ihre Meinung zu einem "Traumberuf" auf.)', sampleAnswer: '例如：「Mein Traumberuf ist es, als Lehrer zu arbeiten, weil ich gerne Kindern helfe.」' }
-                    ],
-                    supplementary: {
-                        '單字': [
-                            { word: 'der Physiotherapeut', partOfSpeech: 'Nomen, maskulin', chinese: '物理治療師 (Physiotherapeut)', example: 'Der Physiotherapeut hilft mir, mein Bein nach dem Unfall zu bewegen.' },
-                            { word: 'die Kinderklinik', partOfSpeech: 'Nomen, feminin', chinese: '兒童醫院 (Kinderklinik)', example: 'Die Kinderklinik ist oft voller bunter Spielsachen.' },
-                            { word: 'der Patient', partOfSpeech: 'Nomen, maskulin', chinese: '病人 (Patient)', example: 'Der Arzt kümmert sich um seinen Patienten.' },
-                            { word: 'die Behandlung', partOfSpeech: 'Nomen, feminin', chinese: '治療 (Behandlung)', example: 'Die Behandlung hat sehr gut geholfen.' },
-                            { word: 'die Bewegung', partOfSpeech: 'Nomen, feminin', chinese: '動作 (Bewegung)', example: 'Für die Genesung ist viel Bewegung wichtig.' },
-                        ],
-                        '片語與慣用語': [
-                            { word: 'an die Hand nehmen', partOfSpeech: 'Redewendung', chinese: '帶領、手把手指導 (jemanden unterstützen oder anleiten)', example: 'Sie nimmt die Eltern an die Hand, um ihnen die Übungen zu zeigen.' },
-                        ],
-                        '練習': [
-                            { question: '根據課文內容，Nina的工作地點主要在哪裡？(Wo arbeitet Nina hauptsächlich laut dem Text?)<br>A. In einer Praxis für Sportler<br>B. In einer großen Kinderklinik<br>C. In einer Gynäkologie<br>D. In einer Schule', type: '選擇題 (Multiple-Choice-Frage)', skill: '閱讀理解、細節掌握 (Leseverständnis, Detailverständnis)', answer: 'B. In einer großen Kinderklinik' },
-                            { question: 'Nina arbeitet als ________ in einer Kinderklinik.', type: '填空題 (Lückentext)', skill: '詞彙應用 (Vokabular-Anwendung)', answer: 'Physiotherapeutin' },
-                            { question: 'Was ist Ninas Traumberuf?', type: '簡答題 (Kurzfrage)', skill: '理解主旨 (Hauptgedanken verstehen)', answer: 'Kinder-Physiotherapeutin' },
-                            { question: '請用「Kinderklinik」造句。(Bilden Sie einen Satz mit "Kinderklinik".)', type: '造句 (Satzbildung)', skill: '造句、文法應用 (Satzstruktur, Grammatik)', answer: 'In der Kinderklinik gibt es viele kranke Kinder.' },
-                            { question: '下列哪一個詞彙不是與醫院相關？(Welches der folgenden Wörter hat keinen Bezug zum Krankenhaus?)<br>A. der Arzt<br>B. die Schwester<br>C. die Schule<br>D. der Patient', type: '選擇題 (Multiple-Choice-Frage)', skill: '詞彙辨識 (Vokabular-Erkennung)', answer: 'C. die Schule' },
-                        ]
-                    }
-                },
-                { 
-                    day: '二', 
-                    goal: '理解醫院工作環境 (Verständnis des Krankenhausumfelds)', 
-                    tasks: [
-                        { type: '聽', description: '聆聽Nina描述她在大學附屬兒童醫院的工作環境與服務對象。 (Hören Sie, wie Nina ihr Arbeitsumfeld und ihre Patienten in der Universitäts-Kinderklinik beschreibt.)', sampleAnswer: '重點是了解早產兒（Frühchen）和加護病房（Intensivstation）等專業詞彙。' },
-                        { type: '說', description: '練習用德文描述「醫院裡的哪些人或工作內容讓你感到敬佩？」 (Üben Sie auf Deutsch zu beschreiben: "Welche Personen oder Aufgaben im Krankenhaus bewundern Sie?")', sampleAnswer: '例如：「Ich bewundere die Ärzte, weil sie immer den Patienten helfen können.」' },
-                        { type: '讀', description: '閱讀Nina描述醫院工作內容的段落，並劃出相關專業詞彙。 (Lesen Sie den Abschnitt, in dem Nina ihre Arbeit im Krankenhaus beschreibt, und markieren Sie relevante Fachbegriffe.)', sampleAnswer: '專業詞彙包含：das Frühchen, die Atmung, die Therapie, die Intensivstation, speziell。' },
-                        { type: '寫', description: '查閱並寫下不同醫療專業人員的德文名稱。 (Recherchieren und schreiben Sie die deutschen Bezeichnungen für verschiedene medizinische Fachkräfte auf.)', sampleAnswer: '例如：der Arzt (醫生), der Pfleger (護理師), der Therapeut (治療師)。' }
-                    ],
-                    supplementary: {
-                        '單字': [
-                            { word: 'das Frühchen', partOfSpeech: 'Nomen, neutrum', chinese: '早產兒 (Frühchen)', example: 'Das Frühchen braucht besondere Pflege und Aufmerksamkeit.' },
-                            { word: 'die Atmung', partOfSpeech: 'Nomen, feminin', chinese: '呼吸 (Atmung)', example: 'Die Physiotherapeutin hilft den Patienten bei der Atmung.' },
-                            { word: 'die Therapie', partOfSpeech: 'Nomen, feminin', chinese: '治療 (Therapie)', example: 'Die Therapie hat gute Fortschritte gemacht.' },
-                            { word: 'die Intensivstation', partOfSpeech: 'Nomen, feminin', chinese: '加護病房 (Intensivstation)', example: 'Das Frühchen liegt auf der Intensivstation.' },
-                            { word: 'speziell', partOfSpeech: 'Adjektiv', chinese: '特別的 (speziell)', example: 'Die Uniklinik hat sich auf spezielle Fälle spezialisiert.' },
-                        ],
-                        '片語與慣用語': [
-                            { word: 'jemandem auf die Sprünge helfen', partOfSpeech: 'Redewendung', chinese: '幫助某人起步、開始 (jemandem den Anfang erleichtern)', example: 'Manchmal müssen wir den Kindern auf die Sprünge helfen, damit sie sich trauen, sich zu bewegen.' },
-                        ],
-                        '練習': [
-                            { question: '寫出3個你認為在醫院會遇到的專業人士，並用德文描述他們的工作。(Nennen Sie 3 Berufe, denen Sie im Krankenhaus begegnen könnten, und beschreiben Sie ihre Aufgaben auf Deutsch.)', type: '造句 (Satzbildung)', skill: '詞彙應用、句子結構 (Vokabular-Anwendung, Satzstruktur)', answer: '例如：「Der Arzt untersucht die Patienten. Der Pfleger kümmert sich um die Patienten. Der Therapeut hilft den Patienten bei den Übungen.」' },
-                            { question: 'In der Intensivstation arbeiten die Ärzte und die Pfleger zusammen, um sich um die __________ zu kümmern.', type: '填空題 (Lückentext)', skill: '閱讀理解 (Leseverständnis)', answer: 'Frühchen' },
-                            { question: 'Nina arbeitet mit Erwachsenen.', type: '是非題 (Richtig/Falsch-Frage)', skill: '細節掌握 (Detailverständnis)', answer: 'Falsch' },
-                            { question: 'Was ist Ninas Traumberuf?', type: '簡答題 (Kurzfrage)', skill: '理解主旨 (Hauptgedanken verstehen)', answer: 'Kinder-Physiotherapeutin' },
-                            { question: '在文中，提到哪種病人需要特別照顧？(Welche Art von Patienten wird im Text als besonders pflegebedürftig erwähnt?)<br>A. Erwachsene<br>B. Teenager<br>C. Frühchen<br>D. Sportler', type: '選擇題 (Multiple-Choice-Frage)', skill: '閱讀理解、細節掌握 (Leseverständnis, Detailverständnis)', answer: 'C. Frühchen' },
-                        ]
-                    }
-                },
-                { 
-                    day: '三', 
-                    goal: '學習動詞與形容詞的應用 (Anwendung von Verben und Adjektiven lernen)', 
-                    tasks: [
-                        { type: '聽', description: '聆聽Nina提及的各式治療方法和病童狀況。 (Hören Sie sich die verschiedenen Behandlungsmethoden und Patientenzustände an, die Nina erwähnt.)', sampleAnswer: '注意聽「Atemtherapie」（呼吸治療）和「Mobilisation」（活動）這兩個詞彙。' },
-                        { type: '說', description: '根據課文內容，用德文簡述「物理治療師」的工作特點。 (Fassen Sie basierend auf dem Text die Merkmale der Arbeit eines "Physiotherapeuten" auf Deutsch zusammen.)', sampleAnswer: '例如：「Ein Physiotherapeut hilft den Patienten bei der Bewegung. Die Arbeit ist sehr abwechslungsreich und herausfordernd.」' },
-                        { type: '讀', description: '閱讀關於「Atemtherapie」（呼吸治療）和「Mobilisation」（活動）的段落，理解動詞應用。 (Lesen Sie die Absätze über "Atemtherapie" und "Mobilisation", um die Anwendung der Verben zu verstehen.)', sampleAnswer: '請注意動詞「mobilisieren」（活動）和名詞「die Lungenentzündung」（肺炎）的搭配用法。' },
-                        { type: '寫', description: '寫下3-5個描述工作或感受的德文句子。 (Schreiben Sie 3-5 deutsche Sätze, die Ihre Arbeit oder Gefühle beschreiben.)', sampleAnswer: '例如：「Meine Arbeit ist sehr interessant. Manchmal ist es eine Herausforderung, aber ich mag es.」' }
-                    ],
-                    supplementary: {
-                        '單字': [
-                            { word: 'mobilisieren', partOfSpeech: 'Verb', chinese: '活動；動員 (mobilisieren; aktivieren)', example: 'Die Krankenschwester muss den Patienten mobilisieren.' },
-                            { word: 'die Lungenentzündung', partOfSpeech: 'Nomen, feminin', chinese: '肺炎 (Lungenentzündung)', example: 'Eine Lungenentzündung kann sehr gefährlich sein.' },
-                            { word: 'die Muskulatur', partOfSpeech: 'Nomen, feminin', chinese: '肌肉組織 (Muskulatur)', example: 'Starke Muskulatur hilft, den Körper zu stützen.' },
-                            { word: 'die Prophylaxe', partOfSpeech: 'Nomen, feminin', chinese: '預防 (Prophylaxe)', example: 'Atemtherapie ist eine gute Prophylaxe gegen Lungenentzündung.' },
-                            { word: 'zerbrechlich', partOfSpeech: 'Adjektiv', chinese: '脆弱的 (zerbrechlich)', example: 'Die Frühchen sind sehr zerbrechlich.' },
-                        ],
-                        '片語與慣用語': [
-                            { word: 'jemandem unter die Arme greifen', partOfSpeech: 'Redewendung', chinese: '幫助、支援某人 (jemandem helfen)', example: 'Als Physiotherapeutin muss man oft den Patienten unter die Arme greifen.' },
-                        ],
-                        '練習': [
-                            { question: '下面的德文句子有語法錯誤，請改正。(Korrigieren Sie den Grammatikfehler im folgenden deutschen Satz.)<br>Der Physiotherapeut arbeitet mit viele verschiedene Patienten.', type: '改錯題 (Korrekturaufgabe)', skill: '語法修正、格位使用 (Grammatik-Korrektur, Kasus-Anwendung)', answer: 'Der Physiotherapeut arbeitet mit vielen verschiedenen Patienten. (mit + Dativ)' },
-                            { question: 'Die Atemtherapie hilft, eine __________ zu verhindern.', type: '填空題 (Lückentext)', skill: '詞彙應用 (Vokabular-Anwendung)', answer: 'Lungenentzündung' },
-                            { question: 'Die kleinen Kinder sind sehr zerbrechlich.', type: '改錯題 (Korrekturaufgabe)', skill: '語法修正 (Grammatik-Korrektur)', answer: '此句子沒有語法錯誤。 (Der Satz ist grammatikalisch korrekt.)' },
-                            { question: 'Was bedeutet "Mobilisation"?', type: '簡答題 (Kurzfrage)', skill: '定義理解 (Definitionen verstehen)', answer: 'Die Patienten zum Bewegen animieren.' },
-                            { question: 'Nina的工作包含哪一項？(Welche der folgenden Aufgaben gehört zu Ninas Arbeit?)<br>A. 烹飪 (Kochen)<br>B. 呼吸治療 (Atemtherapie)<br>C. 開車 (Autofahren)<br>D. 寫程式 (Programmieren)', type: '選擇題 (Multiple-Choice-Frage)', skill: '閱讀理解 (Leseverständnis)', answer: 'B. 呼吸治療 (Atemtherapie)' },
-                        ]
-                    }
-                },
-                { 
-                    day: '四', 
-                    goal: '掌握口語表達的固定句型 (Beherrschung fester Redewendungen im mündlichen Ausdruck)', 
-                    tasks: [
-                        { type: '聽', description: '聆聽Anni與Nina的對話，留意他們如何使用轉折語與固定句型。 (Hören Sie Anni und Ninas Gespräch und achten Sie darauf, wie sie Übergangswörter und feste Redewendungen verwenden.)', sampleAnswer: '注意聽「jemanden ins Boot holen」（讓某人參與）這類片語。' },
-                        { type: '說', description: '挑選課文中喜歡的固定句型，並練習用自己的話造句。 (Wählen Sie eine feste Redewendung aus dem Text aus und üben Sie, sie in eigenen Sätzen zu verwenden.)', sampleAnswer: '例如：「Wir müssen die Eltern ins Boot holen, um die Therapie zu besprechen.」' },
-                        { type: '讀', description: '閱讀對話中關於「Was macht ihr mit dem?」（你們對他們做了什麼？）的問答，掌握提問與回答的結構。 (Lesen Sie den Frage-und-Antwort-Teil des Gesprächs über "Was macht ihr mit dem?", um die Struktur von Fragen und Antworten zu verstehen.)', sampleAnswer: '觀察問句「Was macht ihr mit ...?」和答句的結構。' },
-                        { type: '寫', description: '寫一篇短文，描述與朋友討論職業選擇的對話。 (Schreiben Sie einen kurzen Text über ein Gespräch mit einem Freund über die Berufswahl.)', sampleAnswer: '例如：「Ich habe mit meinem Freund über meinen Traumberuf gesprochen. Er hat mir viele Herausforderungen genannt, aber ich bin trotzdem motiviert.」' }
-                    ],
-                    supplementary: {
-                        '單字': [
-                            { word: 'der Arbeitsalltag', partOfSpeech: 'Nomen, maskulin', chinese: '日常工作；工作日常 (Arbeitsalltag)', example: 'Der Arbeitsalltag von Nina ist sehr abwechslungsreich.' },
-                            { word: 'ins Boot holen', partOfSpeech: 'Idiom', chinese: '讓某人參與；拉攏 (jemanden ins Boot holen)', example: 'Wir müssen die Eltern ins Boot holen, um dem Kind zu helfen.' },
-                            { word: 'der Austausch', partOfSpeech: 'Nomen, maskulin', chinese: '交流 (Austausch)', example: 'Der Austausch mit Kollegen ist sehr wichtig.' },
-                            { word: 'die Herausforderung', partOfSpeech: 'Nomen, feminin', chinese: '挑戰 (Herausforderung)', example: 'Die Arbeit ist eine große Herausforderung.' },
-                            { word: 'die Kommunikation', partOfSpeech: 'Nomen, feminin', chinese: '溝通 (Kommunikation)', example: 'Gute Kommunikation ist der Schlüssel zum Erfolg.' },
-                        ],
-                        '片語與慣用語': [
-                            { word: 'die Kurve kriegen', partOfSpeech: 'Redewendung', chinese: '成功轉變、扭轉局面 (eine schwierige Situation bewältigen)', example: 'Es ist wichtig, dass die Patienten die Kurve kriegen und wieder gesund werden.' },
-                        ],
-                        '練習': [
-                            { question: '請模擬你是一位物理治療師，向一位家長解釋「Mobilisation」的重要性，並說明這對孩子有什麼幫助。(Stellen Sie sich vor, Sie sind ein Physiotherapeut, und erklären Sie einem Elternteil die Bedeutung der "Mobilisation" und wie sie dem Kind hilft.)', type: '口說模擬 (Sprechsimulation)', skill: '口語表達、溝通技巧 (Mündliche Ausdrucksfähigkeit, Kommunikationsfähigkeiten)', answer: '"Mobilisation ist sehr wichtig, damit das Kind keine Muskulatur verkürzt und möglichst wenig im Bett liegt. Es hilft dem Kind, sich wieder zu bewegen und gesund zu werden."' },
-                            { question: 'Nina findet ihre Arbeit langweilig.', type: '是非題 (Richtig/Falsch-Frage)', skill: '閱讀理解 (Leseverständnis)', answer: 'Falsch' },
-                            { question: 'Was macht Nina, um mit den Eltern zusammenzuarbeiten?', type: '簡答題 (Kurzfrage)', skill: '細節掌握 (Detailverständnis)', answer: 'Sie holt die Eltern "ins Boot".' },
-                            { question: '請用「Herausforderung」造句。(Bilden Sie einen Satz mit "Herausforderung".)', type: '造句 (Satzbildung)', skill: '詞彙應用 (Vokabular-Anwendung)', answer: 'Die Arbeit als Physiotherapeutin ist eine große Herausforderung.' },
-                            { question: '「Arbeitsalltag」這個詞的意思是？(Was bedeutet das Wort "Arbeitsalltag"?)<br>A. 假期 (Urlaub)<br>B. 夢想 (Traum)<br>C. 日常工作 (Alltägliche Arbeit)<br>D. 休息 (Pause)', type: '選擇題 (Multiple-Choice-Frage)', skill: '詞彙辨識 (Vokabular-Erkennung)', answer: 'C. 日常工作 (Alltägliche Arbeit)' },
-                        ]
-                    }
-                },
-                { 
-                    day: '五', 
-                    goal: '綜合應用與挑戰練習 (Umfassende Anwendung und herausfordernde Übungen)', 
-                    tasks: [
-                        { type: '聽', description: '再次完整聆聽Podcast，檢視自己的理解程度。 (Hören Sie sich den Podcast noch einmal an, um Ihr Verständnis zu überprüfen.)', sampleAnswer: '在第二次聆聽時，可嘗試跟讀並更深入理解語氣和細節。' },
-                        { type: '說', description: '嘗試不看課文，用德文口述Nina的職業內容。 (Versuchen Sie, Ninas Beruf auf Deutsch mündlich zusammenzufassen, ohne in den Text zu schauen.)', sampleAnswer: '例如：「Nina arbeitet als Kinder-Physiotherapeutin in einer Uniklinik. Sie kümmert sich um Frühchen und hilft ihnen bei der Atmung und Bewegung. Ihre Arbeit ist eine große Herausforderung, aber sie liebt ihren Job.」' },
-                        { type: '讀', description: '閱讀課文最後一段，了解對Podcast的總結與建議。 (Lesen Sie den letzten Absatz des Textes, um die Zusammenfassung und Empfehlungen des Podcasts zu verstehen.)', sampleAnswer: '本文的總結是，要與病童建立信任關係，並給予足夠的時間。' },
-                        { type: '寫', description: '嘗試寫信給Nina，感謝她的分享並提出一個問題。 (Versuchen Sie, einen Brief an Nina zu schreiben, um ihr für das Teilen zu danken und eine Frage zu stellen.)', sampleAnswer: '例如：「Liebe Nina, vielen Dank für das Teilen Ihrer Erfahrung. Ich hätte eine Frage: Was ist die größte Herausforderung in Ihrem Beruf?」' }
-                    ],
-                    supplementary: {
-                        '單字': [
-                            { word: 'Hospitalisiert sein', partOfSpeech: 'Redewendung', chinese: '住院 (hospitalisiert sein)', example: 'Manche Kinder sind so hospitalisiert, dass sie Angst vor neuen Gesichtern haben.' },
-                            { word: 'die Angst', partOfSpeech: 'Nomen, feminin', chinese: '害怕 (Angst)', example: 'Die Angst vor dem Unbekannten ist oft groß.' },
-                            { word: 'sich trauen', partOfSpeech: 'Verb', chinese: '敢於 (sich trauen)', example: 'Man muss sich trauen, neue Dinge auszuprobieren.' },
-                            { word: 'erklären', partOfSpeech: 'Verb', chinese: '解釋 (erklären)', example: 'Nina erklärt den Kindern, was sie tun wird.' },
-                            { word: 'der Fall', partOfSpeech: 'Nomen, maskulin', chinese: '案例 (Fall)', example: 'Nina arbeitet mit vielen speziellen Fällen.' },
-                        ],
-                        '片語與慣用語': [
-                            { word: 'im selben Boot sitzen', partOfSpeech: 'Redewendung', chinese: '處於相同境地、同舟共濟 (in der gleichen Situation sein)', example: 'Die Eltern wissen, dass sie mit anderen Eltern im selben Boot sitzen.' },
-                        ],
-                        '練習': [
-                            { question: '請將以下德文單字或片語重新排列，組成一個符合課文內容的正確句子。(Ordnen Sie die folgenden deutschen Wörter oder Phrasen neu an, um einen korrekten Satz zu bilden, der dem Text entspricht.)<br>arbeiten / wir / in / Uniklinik / der / weil / wir / spezielle Fälle / haben', type: '句型重組 (Satzumstellung)', skill: '句子重組、文法應用 (Satzumbau, Grammatik-Anwendung)', answer: 'Wir arbeiten in der Uniklinik, weil wir spezielle Fälle haben.' },
-                            { question: 'Manche Kinder haben __________ vor neuen Gesichtern.', type: '填空題 (Lückentext)', skill: '詞彙應用 (Vokabular-Anwendung)', answer: 'Angst' },
-                            { question: 'Nina只和簡單的案例工作.', type: '是非題 (Richtig/Falsch-Frage)', skill: '細節掌握 (Detailverständnis)', answer: 'Falsch' },
-                            { question: 'Wie kann man das Vertrauen der Kinder gewinnen?', type: '簡答題 (Kurzfrage)', skill: '理解主旨 (Hauptgedanken verstehen)', answer: 'Indem man ihnen alles erklärt und ihnen Zeit gibt.' },
-                            { question: '請解釋「Hospitalisiert sein」的意思。(Erklären Sie die Bedeutung von "Hospitalisiert sein".)', type: '口說模擬 (Sprechsimulation)', skill: '口語表達、定義理解 (Mündliche Ausdrucksfähigkeit, Definitionen verstehen)', answer: 'Hospitalisiert sein bedeutet, dass man lange im Krankenhaus war und sich an die Umgebung gewöhnt hat.' },
-                        ]
-                    }
-                },
-                { 
-                    day: '六', 
-                    goal: '單字與句型總複習 (Wiederholung von Vokabular und Satzstrukturen)', 
-                    tasks: [
-                        { type: '聽', description: '複習本週單字與固定句型，利用錄音功能檢查發音。 (Wiederholen Sie die Vokabeln und festen Redewendungen der Woche und überprüfen Sie Ihre Aussprache mit der Aufnahmefunktion.)', sampleAnswer: '建議使用錄音功能，朗讀每日單字卡中的例句，並與音檔發音進行比對。' },
-                        { type: '說', description: '模擬面試，用德文回答「你為什麼想做這份工作？」。 (Simulieren Sie ein Vorstellungsgespräch und antworten Sie auf Deutsch auf die Frage: "Warum möchten Sie diesen Job machen?")', sampleAnswer: '您可以嘗試回答：「Ich möchte diesen Job machen, weil ich gerne Menschen helfe und es mir wichtig ist, etwas Sinnvolles zu tun.」' },
-                        { type: '讀', description: '再次閱讀課文，嘗試不查閱詞典就能理解大部分內容。 (Lesen Sie den Text erneut und versuchen Sie, den Großteil des Inhalts ohne Wörterbuch zu verstehen.)', sampleAnswer: '建議您可以專注於理解主要段落的內容，而不必糾結於每一個單字。' },
-                        { type: '寫', description: '寫下本週學習心得與下週學習目標。 (Schreiben Sie Ihre Lernerfahrungen dieser Woche und Ihre Lernziele für die nächste Woche auf.)', sampleAnswer: '您可以寫：「Diese Woche habe ich viel über den Beruf als Physiotherapeutin gelernt. Nächste Woche möchte ich mehr Redewendungen üben.」' }
-                    ],
-                    supplementary: {
-                        '單字': [],
-                        '片語與慣用語': [],
-                        '練習': []
-                    }
-                },
-                { 
-                    day: '日', 
-                    goal: '休息與自我評量 (Ruhe und Selbsteinschätzung)', 
-                    tasks: [
-                        { type: '聽', description: '聽德文歌曲或看德文影片，輕鬆接觸德文。 (Hören Sie deutsche Lieder oder schauen Sie deutsche Videos, um sich entspannt mit der Sprache zu beschäftigen.)', sampleAnswer: '建議您可以觀看一部簡單的德文動畫片，並嘗試理解其中的主要情節。' },
-                        { type: '說', description: '自由聊天，嘗試將本週學到的詞彙和句型融入對話。 (Führen Sie ein freies Gespräch und versuchen Sie, die in dieser Woche gelernten Vokabeln und Redewendungen zu integrieren.)', sampleAnswer: '例如，您可以嘗試說：「Der Physiotherapeut hat mir geholfen, meine Atmung zu verbessern. Das war eine große Herausforderung für mich.」' },
-                        { type: '讀', description: '閱讀德文新聞或短篇故事，擴大閱讀範圍。 (Lesen Sie deutsche Nachrichten oder Kurzgeschichten, um Ihren Leseumfang zu erweitern.)', sampleAnswer: '建議您可以閱讀德文版的兒童故事書，通常詞彙和句型都比較簡單。' },
-                        { type: '寫', description: '寫下本週最喜歡的一個德文詞彙或句子，並說明原因。 (Schreiben Sie Ihr liebstes deutsches Wort oder Ihren liebsten Satz der Woche auf und begründen Sie, warum.)', sampleAnswer: '例如，您可以寫：「Mein Lieblingswort diese Woche ist ‘Herausforderung’, weil es meine Lernreise gut beschreibt.」' }
-                    ],
-                    supplementary: {
-                        '單字': [],
-                        '片語與慣用語': [],
-                        '練習': []
-                    }
-                }
-            ];
-
-            const navContainer = document.querySelector('nav');
-            const contentContainer = document.getElementById('plan-content');
-
-            const taskIcons = {
-                '聽': '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>',
-                '說': '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>',
-                '讀': '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v11.494m-9-5.494h18M5.454 6.253L3 12m18 0l-2.454-5.747M5.454 17.747L3 12m18 0l-2.454 5.747M12 6.253v11.494" /></svg>',
-                '寫': '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>',
-                '單字': '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>',
-                '片語': '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.085 15.11a.875.875 0 01-1.246.064l-3.23-2.61a.875.875 0 010-1.305l3.23-2.61a.875.875 0 011.246.064c.26.31.22.75-.06.993l-2.316 1.875 2.316 1.875c.28.243.32.683.06.993zM12.915 8.89a.875.875 0 011.246-.064l3.23 2.61a.875.875 0 010 1.305l-3.23 2.61a.875.875 0 01-1.246-.064c-.26-.31-.22-.75.06-.993l2.316-1.875-2.316-1.875c-.28-.243-.32-.683-.06-.993zM15 12h-6" /></svg>',
-                '練習': '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>'
-            };
-            
-            const taskColors = {
-                '聽': 'bg-sky-500',
-                '說': 'bg-amber-500',
-                '讀': 'bg-emerald-500',
-                '寫': 'bg-rose-500',
-                '單字': 'bg-violet-500',
-                '片語': 'bg-fuchsia-500',
-                '練習': 'bg-teal-500'
-            };
-
-            function displayPlan(dayIndex) {
-                const dayData = planData[dayIndex];
-                
-                let contentHTML = `
-                    <div class="text-center mb-8">
-                        <h2 class="text-2xl font-bold text-blue-600">週${dayData.day}：${dayData.goal}</h2>
-                        <p class="text-lg text-gray-500 mt-2">核心任務 (聽、說、讀、寫)</p>
+    // The core learning plan data
+    const learningPlanData = [
+        {
+            day: '第一天',
+            title: '認識德國國防新創公司',
+            germanTitle: 'Tag 1: Deutsche Rüstungs-Start-ups kennenlernen',
+            goal: '了解德國國防新創公司的現狀、主要產品及所面臨的早期挑戰。',
+            germanGoal: 'Ziel: Den aktuellen Stand deutscher Rüstungs-Start-ups, ihre Hauptprodukte und frühen Herausforderungen verstehen.',
+            tasks: [
+                { type: '聽', description: '聽取文件第一頁的內容，了解德國國防新創公司如何獲得投資。', german: 'Hören Sie sich den Inhalt der ersten Seite an, um zu verstehen, wie deutsche Rüstungs-Start-ups finanziert werden.', example: '私人投資者已投入超過十億歐元。' },
+                { type: '說', description: '練習用德文說出「這些公司是德國新創界的新星」。', german: 'Üben Sie, auf Deutsch zu sagen: "Sie sind die Stars in der deutschen Start-up-Szene."', example: '"Sie sind die Stars in der deutschen Start-up-Szene, junge Unternehmen der Rüstungsindustrie."' },
+                { type: '讀', description: '閱讀文件第一頁，找出 ARX Robotics 和 Quantum Systems 的主要產品。', german: 'Lesen Sie die erste Seite des Dokuments und identifizieren Sie die Hauptprodukte von ARX Robotics und Quantum Systems.', example: 'ARX Robotics 開發了迷你坦克，Quantum Systems 開發了無人機。' },
+                { type: '寫', description: '用德文寫下一句話，描述您對這些新創公司的第一印象。', german: 'Schreiben Sie einen Satz auf Deutsch, der Ihren ersten Eindruck von diesen Start-ups beschreibt.', example: 'Ich finde es interessant, dass junge Unternehmen in der Rüstungsindustrie aktiv sind.' }
+            ],
+            supplementary: {
+                words: [
+                    { word: 'Rüstungsindustrie', partOfSpeech: 'n.', meaning: '國防工業', example: 'Sie sind junge Unternehmen der Rüstungsindustrie.' },
+                    { word: 'finanzieren', partOfSpeech: 'v.', meaning: '資助、提供資金', example: 'Sie wurden mit über einer Milliarde Euro finanziert.' },
+                    { word: 'Drohne', partOfSpeech: 'n.', meaning: '無人機', example: 'Besonders gefragt sind Drohnen wie diese.' },
+                    { word: 'Mini-Panzer', partOfSpeech: 'n.', meaning: '迷你坦克', example: 'ARX Robotics hat einen Mini-Panzer entwickelt.' },
+                    { word: 'Privatinvestor', partOfSpeech: 'n.', meaning: '私人投資者', example: 'Die Investoren steckten 33 Millionen Euro in das Start-up.' }
+                ],
+                phrases: [
+                    { phrase: 'auf eigenen Beinen stehen', type: '慣用語', meaning: '自立、獨立', example: 'Europa muss im Bereich Verteidigung auf eigenen Beinen stehen.' },
+                    { phrase: 'sich nicht verlassen können auf', type: '片語', meaning: '無法依賴', example: 'Wir können uns nicht auf Amerika verlassen.' },
+                    { phrase: 'Anklang finden bei', type: '片語', meaning: '受到...歡迎', example: 'Sie wissen nicht, ob ihre Produkte später Anklang bei Armeen finden werden.' }
+                ],
+                exercises: [
+                    { question: '根據文件，ARX Robotics 開發的迷你坦克有什麼用途？', german: 'Welche Zwecke erfüllt der Mini-Panzer von ARX Robotics laut dem Dokument?', type: '閱讀理解', skill: '理解', answer: '用雷射干擾敵人，以及運送受傷的士兵。', germanAnswer: 'Er verwirrt Feinde mit Lasern und kann zum Transport verwundeter Soldaten eingesetzt werden.' },
+                    { question: '將「歐洲必須在國防領域獨立」翻譯成德文。', german: 'Übersetzen Sie "Europa muss im Bereich Verteidigung auf eigenen Beinen stehen" ins Chinesische.', type: '德文翻譯', skill: '寫作', answer: 'Europa muss im Bereich Verteidigung auf eigenen Beinen stehen.', germanAnswer: 'Europa muss im Bereich Verteidigung auf eigenen Beinen stehen.' },
+                    { question: '請解釋「Besorgniserregend finde ich」的中文意思。', german: 'Bitte erklären Sie die Bedeutung von "Besorgniserregend finde ich" auf Chinesisch.', type: '片語解釋', skill: '詞彙', answer: '我覺得這很令人擔憂。', germanAnswer: 'Ich finde das besorgniserregend.' },
+                    { question: '這份文件暗示了什麼樣的國際關係變化，導致歐洲重新思考其國防政策？', german: 'Welche Veränderung in den internationalen Beziehungen wird im Dokument angedeutet, die Europa dazu veranlasst, seine Verteidigungspolitik zu überdenken?', type: '綜合理解', skill: '分析', answer: '文件提到了跨大西洋關係的變化，導致歐洲意識到不能再依賴美國。', germanAnswer: 'Das Dokument erwähnt die transatlantischen Beziehungen, die dazu geführt haben, dass Europa verstanden hat, dass es sich nicht mehr auf Amerika verlassen kann.' }
+                ]
+            }
+        },
+        {
+            day: '第二天',
+            title: '「風險」與「速度」的雙重挑戰',
+            germanTitle: 'Tag 2: Die doppelten Herausforderungen von "Risiko" und "Tempo"',
+            goal: '深入探討新創公司在產品開發中所面臨的「自擔風險」以及對「速度」的追求。',
+            germanGoal: 'Ziel: Die Herausforderungen der Start-ups in der Produktentwicklung, insbesondere das "eigene Risiko" und das Streben nach "Tempo", vertiefen.',
+            tasks: [
+                { type: '聽', description: '聽取文件第二頁，了解為何新創公司必須「自擔風險」開發產品。', german: 'Hören Sie sich die zweite Seite des Dokuments an, um zu verstehen, warum die Start-ups ihre Produkte "auf eigenes Risiko" entwickeln müssen.', example: '他們不等大型開發訂單，而是預測市場需求。' },
+                { type: '說', description: '練習用德文說出「我們是自擔風險進行開發」。', german: 'Üben Sie, auf Deutsch zu sagen: "Wir entwickeln auf eigenes Risiko."', example: '"Wir entwickeln auf eigenes Risiko."' },
+                { type: '讀', description: '閱讀文件第二頁，找出新創公司與 Hettec 合作開發的產品。', german: 'Lesen Sie die zweite Seite des Dokuments und finden Sie heraus, welches Produkt in Zusammenarbeit mit Hettec entwickelt wurde.', example: '一款高科技無人機。' },
+                { type: '寫', description: '寫下「Schnell」這個字對新創公司來說為什麼如此重要。', german: 'Schreiben Sie auf, warum das Wort "schnell" für die Start-ups so wichtig ist.', example: '因為能最快推出創新產品的公司，在潛在的戰爭中具有優勢。' }
+            ],
+            supplementary: {
+                words: [
+                    { word: 'Eigenes Risiko', partOfSpeech: 'n.', meaning: '自擔風險', example: 'Wir entwickeln auf eigenes Risiko.' },
+                    { word: 'antizipieren', partOfSpeech: 'v.', meaning: '預測', example: 'Wir antizipieren den Bedarf des Marktes.' },
+                    { word: 'Innovation', partOfSpeech: 'n.', meaning: '創新', example: 'Wer am schnellsten mit Innovationen aufwarten kann, hat Vorteile.' },
+                    { word: 'Tempo', partOfSpeech: 'n.', meaning: '速度', example: 'Tempo ist also bei der Entwicklung gefragt.' },
+                    { word: 'Herausforderung', partOfSpeech: 'n.', meaning: '挑戰', example: 'Wir haben die besondere Herausforderung der Zertifizierung.' }
+                ],
+                phrases: [
+                    { phrase: 'mit Innovationen aufwarten', type: '片語', meaning: '提出創新', example: 'Wer am schnellsten mit Innovationen aufwarten kann, hat Vorteile.' },
+                    { phrase: 'in Einklang bringen mit', type: '片語', meaning: '使與...一致', example: 'Wir müssen Innovation mit Zertifizierung in Einklang bringen.' },
+                    { phrase: 'darauf ausgelegt sein', type: '片語', meaning: '被設計成...', example: 'Prozesse sind nicht darauf ausgelegt, möglichst schnell abzulaufen.' }
+                ],
+                exercises: [
+                    { question: '除了烏克蘭的戰場回饋之外，新創公司還會從哪裡獲得客戶回饋？', german: 'Woher bekommen die Start-ups neben dem Feedback aus der Ukraine noch Kundenfeedback?', type: '細節理解', skill: '理解', answer: '他們會聽取來自安全和國防市場的回饋。', germanAnswer: 'Sie hören auch auf das Feedback aus dem Sicherheits- und Verteidigungsmarkt.' },
+                    { question: '新創公司在「創新」與「認證」之間面臨什麼樣的「困境」？', german: 'In welchem "Dilemma" befinden sich die Start-ups zwischen "Innovation" und "Zertifizierung"?', type: '閱讀理解', skill: '理解', answer: '一方面要快速創新，另一方面又要遵守非為「快速」設計的認證標準。', germanAnswer: 'Sie müssen Innovationen schnell schaffen, aber die Zertifizierungsprozesse sind nicht darauf ausgelegt, schnell zu sein.' },
+                    { question: '將「追求速度很重要」翻譯成德文。', german: 'Übersetzen Sie "追求速度很重要" ins Deutsche.', type: '德文翻譯', skill: '寫作', answer: 'Tempo ist also gefragt.', germanAnswer: 'Tempo ist also gefragt.' },
+                    { question: '請解釋「in Einklang bringen mit」的中文意思。', german: 'Bitte erklären Sie die Bedeutung von "in Einklang bringen mit" auf Chinesisch.', type: '片語解釋', skill: '詞彙', answer: '與...協調一致、調和。', germanAnswer: 'Etwas mit etwas anderem in Einklang bringen oder abstimmen.' }
+                ]
+            }
+        },
+        {
+            day: '第三天',
+            title: '漫長的軍購流程：新創公司的財務困境',
+            germanTitle: 'Tag 3: Langwierige Beschaffungsprozesse: Finanzielle Engpässe für Start-ups',
+            goal: '分析德國軍方漫長的採購流程如何對新創公司的財務和生存造成威脅。',
+            germanGoal: 'Ziel: Analysieren, wie die langwierigen Beschaffungsprozesse der Bundeswehr die finanzielle Situation und das Überleben von Start-ups gefährden.',
+            tasks: [
+                { type: '聽', description: '聽取文件第二頁和第三頁，了解德國軍方的採購流程有多長。', german: 'Hören Sie sich die zweite und dritte Seite des Dokuments an, um herauszufinden, wie lange die Beschaffungsprozesse bei der Bundeswehr dauern.', example: '從招標到購買可能需要好幾年。' },
+                { type: '說', description: '練習用德文向投資者解釋這個問題：「德國軍方採購太慢了」。', german: 'Üben Sie, einem Investor auf Deutsch das Problem zu erklären: "Die Beschaffung bei der Bundeswehr ist zu langsam."', example: '"Bei der Bundeswehr vergehen von der Ausschreibung bis zum Kauf teilweise mehrere Jahre."' },
+                { type: '讀', description: '閱讀文件第三頁，找出這個問題對新創公司財務狀況的具體影響。', german: 'Lesen Sie die dritte Seite des Dokuments und identifizieren Sie die konkreten Auswirkungen dieses Problems auf die Finanzen der Start-ups.', example: '在等待期間，新創公司無法產生收入，也難以說服潛在投資者繼續投資。' },
+                { type: '寫', description: '寫下為什麼德國軍方（Bundeswehr）是新創公司的「第一買家」。', german: 'Schreiben Sie auf, warum die Bundeswehr "in der Regel der erste Käufer" für diese Start-ups ist.', example: '因為這些是專門為軍事用途開發的產品，只有軍方會採購。' }
+            ],
+            supplementary: {
+                words: [
+                    { word: 'Ausschreibung', partOfSpeech: 'n.', meaning: '招標', example: 'Von der Ausschreibung bis zum Kauf vergehen Jahre.' },
+                    { word: 'aufstrebend', partOfSpeech: 'adj.', meaning: '有前途的、新興的', example: 'Das ist schlecht für aufstrebende Start-ups.' },
+                    { word: 'Spitzentechnologie', partOfSpeech: 'n.', meaning: '尖端技術', example: 'Ein Start-up kann mit innovativer Spitzentechnologie pleitegehen.' },
+                    { word: 'Einkommen', partOfSpeech: 'n.', meaning: '收入', example: 'Das Start-up kann in dieser Zeit kein Einkommen generieren.' },
+                    { word: 'potenziell', partOfSpeech: 'adj.', meaning: '潛在的', example: 'Es kann potenzielle Investoren nicht überzeugen.' }
+                ],
+                phrases: [
+                    { phrase: 'das Geld ausgehen', type: '慣用語', meaning: '錢用完、破產', example: 'Einem Start-up kann das Geld ausgehen.' },
+                    { phrase: 'jdn. überzeugen', type: '片語', meaning: '說服某人', example: 'Es kann potenzielle Investoren nicht überzeugen.' },
+                    { phrase: 'neue Wege beschreiten', type: '慣用語', meaning: '開創新路', example: 'Wir müssen jetzt neue Wege beschreiten.' }
+                ],
+                exercises: [
+                    { question: '「Bundeswehr」的中文意思是什麼？', german: 'Was bedeutet "Bundeswehr" auf Chinesisch?', type: '詞彙', skill: '理解', answer: '德國聯邦國防軍。', germanAnswer: 'Die deutsche Bundeswehr.' },
+                    { question: '根據文件，為什麼新創公司在等待德國軍方採購期間，難以獲得更多投資？', german: 'Warum fällt es den Start-ups schwer, in der Wartezeit auf die Beschaffung der Bundeswehr weitere Investitionen zu erhalten?', type: '閱讀理解', skill: '理解', answer: '因為他們無法產生收入，這使得他們無法說服投資者繼續提供資金。', germanAnswer: 'Weil sie in dieser Zeit kein Einkommen generieren können, was es ihnen schwer macht, potenzielle Investoren zu überzeugen, weiter Geld zu geben.' },
+                    { question: '將「德國軍隊的採購程序需要好幾年」翻譯成德文。', german: 'Übersetzen Sie "德國軍隊的採購程序需要好幾年" ins Deutsche.', type: '德文翻譯', skill: '寫作', answer: 'Bei der Bundeswehr vergehen von der Ausschreibung bis zum Kauf teilweise mehrere Jahre.', germanAnswer: 'Bei der Bundeswehr vergehen von der Ausschreibung bis zum Kauf teilweise mehrere Jahre.' },
+                    { question: '你認為政府可以如何改善採購流程，以支持這些創新公司？', german: 'Wie könnte die Regierung Ihrer Meinung nach den Beschaffungsprozess verbessern, um innovative Unternehmen zu unterstützen?', type: '延伸思考', skill: '批判性思考', answer: '（開放式問題，提供德文答案範例）', germanAnswer: 'Die Regierung könnte beispielsweise Pilotprojekte mit verkürzten Fristen einführen, um innovative Produkte schneller zu testen und zu evaluieren.' }
+                ]
+            }
+        },
+        {
+            day: '第四天',
+            title: '「歐洲製造」的呼籲與策略',
+            germanTitle: 'Tag 4: Der Ruf nach "Made in European Union" und die Strategie dahinter',
+            goal: '理解為何文件強調國防產品應「德國製造」或「歐洲製造」，並分析其背後的戰略考量。',
+            germanGoal: 'Ziel: Verstehen, warum das Dokument betont, dass Rüstungsprodukte "Made in Germany" oder "Made in European Union" sein sollten, und die strategischen Überlegungen dahinter analysieren.',
+            tasks: [
+                { type: '聽', description: '聽取文件第三頁，找出為何供應鏈來自歐洲以外會帶來問題。', german: 'Hören Sie sich die dritte Seite des Dokuments an, um zu verstehen, warum Teile von außerhalb Europas problematisch sein können.', example: '當發生衝突時，這會變得不妙。' },
+                { type: '說', description: '練習用德文說出「我們不能依賴那些我們視為戰略對手的國家」。', german: 'Üben Sie, auf Deutsch zu sagen: "Wir dürfen nicht von Ländern abhängig sein, die wir als strategische Widersacher einordnen."', example: '"Wir dürfen gerade, was unsere Verteidigung angeht, nicht abhängig sein von Ländern, die wir eigentlich jetzt schon als strategische Widersacher einordnen."' },
+                { type: '讀', description: '閱讀文件第三頁，找出解決這個問題的具體要求。', german: 'Lesen Sie die dritte Seite des Dokuments und identifizieren Sie die konkrete Forderung zur Lösung dieses Problems.', example: '必須盡快確保關鍵的基礎設施和生產設施設在歐洲。' },
+                { type: '寫', description: '寫下「kurzsichtig」這個詞的中文意思，並解釋其在上下文中的含義。', german: 'Schreiben Sie die Bedeutung des Wortes "kurzsichtig" auf Chinesisch auf und erklären Sie seine Bedeutung im Kontext.', example: 'kurzsichtig 的意思是「短視近利」，文件認為依賴非歐洲國家是短視的。' }
+            ],
+            supplementary: {
+                words: [
+                    { word: 'abhängig', partOfSpeech: 'adj.', meaning: '依賴的', example: 'Wir dürfen nicht abhängig sein von anderen Ländern.' },
+                    { word: 'Widersacher', partOfSpeech: 'n.', meaning: '對手、敵人', example: 'Wir stufen sie als strategische Widersacher ein.' },
+                    { word: 'fatal', partOfSpeech: 'adj.', meaning: '致命的、災難性的', example: 'Das wäre fatal und das ist kurzsichtig.' },
+                    { word: 'kurzsichtig', partOfSpeech: 'adj.', meaning: '短視的', example: 'Das ist eine kurzsichtige Entscheidung.' },
+                    { word: 'Infrastruktur', partOfSpeech: 'n.', meaning: '基礎設施', example: 'Die entscheidende Infrastruktur muss in Europa liegen.' }
+                ],
+                phrases: [
+                    { phrase: 'Nachholbedarf haben', type: '片語', meaning: '有追趕的需求', example: 'Hier gibt es Nachholbedarf.' },
+                    { phrase: 'in Europa legen', type: '片語', meaning: '設在歐洲', example: 'Die Produktion muss in Europa gelegt werden.' },
+                    { phrase: 'strategisch einordnen', type: '片語', meaning: '進行戰略定位', example: 'Wir müssen die Länder strategisch einordnen.' }
+                ],
+                exercises: [
+                    { question: '根據文件，為什麼國防產品的零件不應來自歐洲以外？', german: 'Warum sollten laut dem Dokument Teile für Rüstungsgüter nicht von außerhalb Europas kommen?', type: '細節理解', skill: '理解', answer: '因為當發生衝突時，這會產生問題，且會讓我們依賴戰略對手。', germanAnswer: 'Weil das im Falle von Konflikten problematisch sein kann und uns von strategischen Widersachern abhängig macht.' },
+                    { question: '將「我們必須盡快確保關鍵的生產設施設在歐洲」翻譯成德文。', german: 'Übersetzen Sie "我們必須盡快確保關鍵的生產設施設在歐洲" ins Deutsche.', type: '德文翻譯', skill: '寫作', answer: 'Wir müssen schnellstmöglich sicherstellen, dass die entscheidende Produktion in Europa gelegt ist.', germanAnswer: 'Wir müssen schnellstmöglich sicherstellen, dass die entscheidende Produktion in Europa gelegt ist.' },
+                    { question: '請解釋「Nachholbedarf haben」的中文意思。', german: 'Bitte erklären Sie die Bedeutung von "Nachholbedarf haben" auf Chinesisch.', type: '片語解釋', skill: '詞彙', answer: '有追趕的需求。', germanAnswer: 'Es gibt einen Aufholbedarf.' },
+                    { question: '你認為「歐洲製造」的國防產品對於強化歐洲的自主防禦能力有什麼幫助？', german: 'Wie kann "Made in European Union" die Autonomie der europäischen Verteidigung stärken?', type: '延伸思考', skill: '批判性思考', answer: '（開放式問題，提供德文答案範例）', germanAnswer: 'Eine europäische Produktion verringert die Abhängigkeit von externen Lieferanten, sichert die Lieferketten in Krisenzeiten und stärkt die technologische Souveränität des Kontinents.' }
+                ]
+            }
+        },
+        {
+            day: '第五天',
+            title: '人工智慧與創新連結的未來',
+            germanTitle: 'Tag 5: Die Zukunft der Vernetzung mit künstlicher Intelligenz',
+            goal: '了解未來國防技術的發展方向，特別是人工智慧如何與各種創新連結。',
+            germanGoal: 'Ziel: Die zukünftige Entwicklung der Verteidigungstechnologie verstehen, insbesondere wie künstliche Intelligenz Innovationen miteinander verbindet.',
+            tasks: [
+                { type: '聽', description: '聽取文件第三頁後半部，找出未來創新的發展趨勢。', german: 'Hören Sie sich den zweiten Teil der dritten Seite an, um den zukünftigen Trend bei Innovationen herauszufinden.', example: '未來的趨勢是將個別創新與人工智慧連結。' },
+                { type: '說', description: '練習用德文說出「藉由人工智慧連結創新，會讓它們更具危險性」。', german: 'Üben Sie, auf Deutsch zu sagen: "Durch die Vernetzung mit KI wären sie noch gefährlicher."', example: '"In Zukunft geht es auch darum, die einzelnen Innovationen zu vernetzen mit Hilfe von künstlicher Intelligenz. So wären sie noch gefährlicher."' },
+                { type: '讀', description: '閱讀文件第四頁，找出這個趨勢對德國新創公司帶來的影響。', german: 'Lesen Sie die vierte Seite des Dokuments und identifizieren Sie die Auswirkungen dieses Trends auf deutsche Start-ups.', example: '這讓德國新創公司面臨更多挑戰。' },
+                { type: '寫', description: '寫下你認為人工智慧在國防領域還有哪些應用可能性。', german: 'Schreiben Sie auf, welche weiteren Anwendungsmöglichkeiten Sie für künstliche Intelligenz im Verteidigungsbereich sehen.', example: 'AI 可以用於戰場分析、目標識別或自動化防禦系統。' }
+            ],
+            supplementary: {
+                words: [
+                    { word: 'vernetzen', partOfSpeech: 'v.', meaning: '連結、網路化', example: 'Es geht darum, die Innovationen zu vernetzen.' },
+                    { word: 'künstliche Intelligenz', partOfSpeech: 'n.', meaning: '人工智慧', example: 'mit Hilfe von künstlicher Intelligenz.' },
+                    { word: 'gefährlich', partOfSpeech: 'adj.', meaning: '危險的', example: 'So wären sie noch gefährlicher.' },
+                    { word: 'herausfordernd', partOfSpeech: 'adj.', meaning: '具有挑戰性的', example: 'Macht alles für die Startups noch herausfordernder.' },
+                    { word: 'Zukunft', partOfSpeech: 'n.', meaning: '未來', example: 'In Zukunft geht es auch um die Vernetzung.' }
+                ],
+                phrases: [
+                    { phrase: 'mit Hilfe von', type: '片語', meaning: '藉由...的幫助', example: 'Die Innovationen werden mit Hilfe von KI vernetzt.' },
+                    { phrase: 'es geht darum', type: '片語', meaning: '重點在於', example: 'In Zukunft geht es auch darum, die Innovationen zu vernetzen.' },
+                    { phrase: 'noch herausfordernder machen', type: '片語', meaning: '變得更具挑戰性', example: 'Das macht alles noch herausfordernder.' }
+                ],
+                exercises: [
+                    { question: '將「人工智慧能連結個別創新」翻譯成德文。', german: 'Übersetzen Sie "人工智慧能連結個別創新" ins Deutsche.', type: '德文翻譯', skill: '寫作', answer: 'Künstliche Intelligenz kann die einzelnen Innovationen vernetzen.', germanAnswer: 'Künstliche Intelligenz kann die einzelnen Innovationen vernetzen.' },
+                    { question: '這份文件如何看待人工智慧與國防創新的結合？', german: 'Wie wird die Kombination von KI und Verteidigungsinnovationen in dem Dokument dargestellt?', type: '綜合理解', skill: '分析', answer: '這被視為一種趨勢，但同時也讓產品更具危險性，並為新創公司帶來更多挑戰。', germanAnswer: 'Sie wird als Trend gesehen, macht die Produkte aber auch gefährlicher und stellt die Start-ups vor noch größere Herausforderungen.' },
+                    { question: '請解釋「noch gefährlicher」的中文意思。', german: 'Bitte erklären Sie die Bedeutung von "noch gefährlicher" auf Chinesisch.', type: '片語解釋', skill: '詞彙', answer: '變得更危險。', germanAnswer: 'Noch gefährlicher.' },
+                    { question: '你認為科技公司在發展國防人工智慧時，應該考慮哪些道德問題？', german: 'Welche ethischen Fragen sollten Technologieunternehmen bei der Entwicklung von KI im Verteidigungsbereich berücksichtigen?', type: '延伸思考', skill: '批判性思考', answer: '（開放式問題，提供德文答案範例）', germanAnswer: 'Ethische Fragen wie die Autonomie von Waffensystemen, die Verantwortung für Entscheidungen, die von KI getroffen werden, und die potenzielle Eskalation von Konflikten müssen berücksichtigt werden.' }
+                ]
+            }
+        },
+        {
+            day: '第六天',
+            title: '綜合分析與總結回顧',
+            germanTitle: 'Tag 6: Umfassende Analyse und Rekapitulation',
+            goal: '回顧前五天的學習內容，並綜合分析德國國防新創公司所面臨的機會與挑戰。',
+            germanGoal: 'Ziel: Die Lerninhalte der ersten fünf Tage rekapitulieren und die Chancen und Herausforderungen für deutsche Rüstungs-Start-ups umfassend analysieren.',
+            tasks: [
+                { type: '聽', description: '完整地再聽一次音訊，將新學到的單字和片語應用到聆聽理解中。', german: 'Hören Sie das gesamte Audio noch einmal an und wenden Sie die neu gelernten Vokabeln und Phrasen beim Verstehen an.', example: '我現在能更清楚地聽懂新創公司面臨的困境。' },
+                { type: '說', description: '練習用德文簡述德國國防新創公司的優勢與劣勢。', german: 'Üben Sie, auf Deutsch die Stärken und Schwächen der deutschen Rüstungs-Start-ups kurz zusammenzufassen.', example: 'Ihre Stärke ist die Innovation, aber ihre Schwäche ist der langsame Beschaffungsprozess der Bundeswehr.' },
+                { type: '讀', description: '再次瀏覽文件，將不同頁面的內容聯繫起來，形成一個完整的脈絡。', german: 'Lesen Sie das Dokument nochmals durch und vernetzen Sie die Inhalte der verschiedenen Seiten zu einem vollständigen Kontext.', example: '投資者的擔憂與軍方的採購速度有直接關聯。' },
+                { type: '寫', description: '寫一篇短文，探討德國國防新創公司如何才能在國際競爭中脫穎而出。', german: 'Schreiben Sie einen kurzen Aufsatz, in dem Sie diskutieren, wie deutsche Rüstungs-Start-ups im internationalen Wettbewerb bestehen können.', example: 'Sie müssen sowohl schnell innovative Produkte entwickeln als auch neue Wege finden, um die Finanzierung zu sichern.' }
+            ],
+            supplementary: {
+                words: [
+                    { word: 'Wettbewerb', partOfSpeech: 'n.', meaning: '競爭', example: 'Sie müssen sich im internationalen Wettbewerb behaupten.' },
+                    { word: 'Chancen', partOfSpeech: 'n. (pl.)', meaning: '機會', example: 'Start-ups sehen Chancen in unsicheren Zeiten.' },
+                    { word: 'sicherstellen', partOfSpeech: 'v.', meaning: '確保', example: 'Wir müssen sicherstellen, dass die Produktion in Europa liegt.' },
+                    { word: 'Hintergrund', partOfSpeech: 'n.', meaning: '背景', example: 'Der Hintergrund der Krise sind die transatlantischen Beziehungen.' },
+                    { word: 'Zusammenhang', partOfSpeech: 'n.', meaning: '關聯、上下文', example: 'Ich sehe den Zusammenhang zwischen den Problemen.' }
+                ],
+                phrases: [
+                    { phrase: 'sich einen Überblick verschaffen', type: '片語', meaning: '獲得一個總體概述', example: 'Ich habe mir einen Überblick über das Thema verschafft.' },
+                    { phrase: 'insgesamt', type: '副詞', meaning: '總體來說', example: 'Insgesamt ist die Situation herausfordernd.' },
+                    { phrase: 'im Vergleich zu', type: '片語', meaning: '與...相比', example: 'Im Vergleich zu anderen Ländern hat Deutschland Nachholbedarf.' }
+                ],
+                exercises: [
+                    { question: '總結德國國防新創公司的三個主要挑戰。', german: 'Fassen Sie die drei Haupt-Herausforderungen für deutsche Rüstungs-Start-ups zusammen.', type: '總結', skill: '綜合', answer: '冗長的軍購流程、依賴歐洲以外的供應鏈，以及將創新與 AI 結合的技術挑戰。', germanAnswer: 'Langwierige Beschaffungsprozesse, die Abhängigkeit von außereuropäischen Lieferketten und die Herausforderung, Innovationen mit KI zu vernetzen.' },
+                    { question: '將「這個問題的解決方案是建立一個歐洲供應鏈」翻譯成德文。', german: 'Übersetzen Sie "這個問題的解決方案是建立一個歐洲供應鏈" ins Deutsche.', type: '德文翻譯', skill: '寫作', answer: 'Die Lösung für dieses Problem ist die Schaffung einer europäischen Lieferkette.', germanAnswer: 'Die Lösung für dieses Problem ist die Schaffung einer europäischen Lieferkette.' },
+                    { question: '你認為哪些國際事件促使歐洲開始尋求國防自主？', german: 'Welche internationalen Ereignisse könnten Europa dazu veranlasst haben, mehr Verteidigungsautonomie anzustreben?', type: '延伸思考', skill: '批判性思考', answer: '（開放式問題，提供德文答案範例）', germanAnswer: 'Der Ukraine-Krieg und die veränderten transatlantischen Beziehungen haben gezeigt, dass Europa seine Verteidigung auf eigenen Beinen stehen muss.' },
+                    { question: '請解釋「strategische Widersacher」的中文意思。', german: 'Bitte erklären Sie die Bedeutung von "strategische Widersacher" auf Chinesisch.', type: '片語解釋', skill: '詞彙', answer: '戰略對手。', germanAnswer: 'Strategische Gegenspieler.' }
+                ]
+            }
+        },
+        {
+            day: '第七天',
+            title: '全面回顧與個人觀點反思',
+            germanTitle: 'Tag 7: Umfassende Überprüfung und persönliche Reflexion',
+            goal: '回顧所有學習內容，形成對德國國防新創公司議題的個人觀點，並能以德文進行闡述。',
+            germanGoal: 'Ziel: Alle Lerninhalte rekapitulieren, eine persönliche Meinung zum Thema der deutschen Rüstungs-Start-ups entwickeln und diese auf Deutsch formulieren können.',
+            tasks: [
+                { type: '聽', description: '完整地再聽一次音訊，檢查是否所有細節都能理解。', german: 'Hören Sie das Audio noch einmal komplett an und überprüfen Sie, ob Sie alle Details verstehen können.', example: '我現在可以不看文字稿就聽懂大部分內容。' },
+                { type: '說', description: '整理自己的所有觀點，練習向他人介紹這個議題，並回答可能的問題。', german: 'Strukturieren Sie Ihre eigenen Argumente und üben Sie, das Thema zu präsentieren und mögliche Fragen zu beantworten.', example: '"Die größte Herausforderung für die deutschen Start-ups ist die Bürokratie der Bundeswehr und die Abhängigkeit der Lieferketten."' },
+                { type: '讀', description: '再次瀏覽文件，特別關注那些在學習初期不熟悉的詞彙或句子，並反思其意義。', german: 'Überfliegen Sie das Dokument erneut und konzentrieren Sie sich dabei auf Vokabeln und Sätze, die Ihnen zu Beginn unbekannt waren.', example: '例如：Rüstungsindustrie, Ausschreibung, kurzsichtig。' },
+                { type: '寫', description: '寫一篇綜合報告，總結整個學習計畫的收穫，並闡述你對德國國防產業未來發展的看法和建議。', german: 'Schreiben Sie einen umfassenden Bericht, in dem Sie die Lernergebnisse der gesamten Woche zusammenfassen und Ihre Ansichten und Vorschläge zur Zukunft der deutschen Rüstungsindustrie darlegen.', example: '經過這七天的學習，我認為德國新創公司在技術上具有優勢，但需要政府在政策上提供更多支持。' }
+            ],
+            supplementary: {
+                words: [
+                    { word: 'Reflexion', partOfSpeech: 'n.', meaning: '反思', example: 'Eine gründliche Reflexion ist für das Lernen wichtig.' },
+                    { word: 'Perspektive', partOfSpeech: 'n.', meaning: '觀點', example: 'Ich habe eine neue Perspektive auf das Thema gewonnen.' },
+                    { word: 'Maßnahmen', partOfSpeech: 'n. (pl.)', meaning: '措施', example: 'Es müssen effektive Maßnahmen ergriffen werden.' },
+                    { word: 'Autonomie', partOfSpeech: 'n.', meaning: '自主權', example: 'Die europäische Verteidigungsautonomie ist wichtig.' },
+                    { word: 'nachhaltig', partOfSpeech: 'adj.', meaning: '永續的', example: 'Wir brauchen eine nachhaltige Strategie.' }
+                ],
+                phrases: [
+                    { phrase: 'unter die Lupe nehmen', type: '慣用語', meaning: '仔細審查', example: 'Wir müssen die Probleme unter die Lupe nehmen.' },
+                    { phrase: 'im Allgemeinen', type: '副詞', meaning: '一般來說', example: 'Im Allgemeinen sind die Aussichten gut, aber es gibt Risiken.' },
+                    { phrase: 'Handlungsbedarf sehen', type: '片語', meaning: '認為有必要採取行動', example: 'Die Regierung sieht Handlungsbedarf.' }
+                ],
+                exercises: [
+                    { question: '請用一句話總結你對德國國防新創公司所面臨的最大困境的理解。', german: 'Fassen Sie Ihr Verständnis des größten Dilemmas für deutsche Rüstungs-Start-ups in einem Satz zusammen.', type: '總結', skill: '綜合', answer: '（開放式問題，提供德文答案範例）', germanAnswer: 'Das größte Dilemma besteht darin, dass innovative Start-ups durch langwierige staatliche Beschaffungsprozesse in finanzielle Engpässe geraten und so ihre Wettbewerbsfähigkeit verlieren könnten.' },
+                    { question: '你認為這份文件主要是在表達哪種情緒？', german: 'Welche Stimmung vermittelt das Dokument Ihrer Meinung nach hauptsächlich?', type: '語氣分析', skill: '分析', answer: '（開放式問題，提供德文答案範例）', germanAnswer: 'Das Dokument vermittelt eine besorgte, aber auch lösungsorientierte Stimmung. Es hebt die Probleme hervor, zeigt aber auch, dass es neue Wege und Chancen gibt.' },
+                    { question: '將「我們必須為未來做準備」翻譯成德文。', german: 'Übersetzen Sie "我們必須為未來做準備" ins Deutsche.', type: '德文翻譯', skill: '寫作', answer: 'Wir müssen uns auf die Zukunft vorbereiten.', germanAnswer: 'Wir müssen uns auf die Zukunft vorbereiten.' }
+                ],
+                summary: `
+                    <div className="p-4 bg-purple-50 rounded-lg border border-purple-200 mt-6">
+                        <h4 className="text-lg font-bold text-gray-700 mb-2">總結摘要 (Zusammenfassung)</h4>
+                        <p className="text-gray-800 leading-relaxed">
+                            Deutsche Rüstungs-Start-ups haben in letzter Zeit viel Aufmerksamkeit und über eine Milliarde Euro von Privatinvestoren erhalten. Sie entwickeln innovative Produkte wie Mini-Panzer und Hightech-Drohnen. Doch trotz dieser Innovationen stehen sie vor erheblichen Herausforderungen. Das größte Problem ist der extrem langsame Beschaffungsprozess der Bundeswehr, der oft mehrere Jahre dauert. In dieser Zeit können die jungen Unternehmen kein Einkommen generieren und haben Schwierigkeiten, Investoren zu überzeugen, weiterhin zu finanzieren. Des Weiteren wird im Dokument die Notwendigkeit betont, die Abhängigkeit von außereuropäischen Lieferketten zu verringern, um in Krisenzeiten technologisch autonom zu sein. Es wird gefordert, dass die Produktion in Europa gesichert wird, um nicht von strategischen Widersachern abhängig zu sein. Die Zukunft liegt in der Vernetzung dieser Innovationen durch künstliche Intelligenz, was die Start-ups vor noch größere Herausforderungen stellt, aber auch neue Möglichkeiten eröffnet. Es bedarf einer klaren Strategie und schnellerer Prozesse, um diese Potenziale voll auszuschöpfen.
+                        </p>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                `;
-                
-                dayData.tasks.forEach((task, index) => {
-                    contentHTML += `
-                        <div class="task-card bg-white rounded-xl shadow-lg overflow-hidden flex items-start p-5">
-                            <div class="flex-shrink-0 w-16 h-16 rounded-full ${taskColors[task.type]} flex items-center justify-center mr-5">
-                                ${taskIcons[task.type]}
+                `
+            }
+        },
+    ];
+
+    const toggleExerciseAnswer = (dayIndex, exerciseIndex) => {
+        setOpenExercises(prev => ({
+            ...prev,
+            [`${dayIndex}-${exerciseIndex}`]: !prev[`${dayIndex}-${exerciseIndex}`]
+        }));
+    };
+
+    // Mapping for Lucide icons
+    const iconMap = {
+        'listen': <Mic className="w-6 h-6" />,
+        'speak': <MessageSquare className="w-6 h-6" />,
+        'read': <Book className="w-6 h-6" />,
+        'write': <Pen className="w-6 h-6" />,
+        'vocab': <Lightbulb className="w-6 h-6" />,
+        'phrases': <Zap className="w-6 h-6" />,
+        'exercises': <CheckSquare className="w-6 h-6" />,
+        'summary': <Award className="w-6 h-6" />
+    };
+
+    const DayContent = ({ dayData, dayIndex, toggleAnswer, openExercises }) => {
+        return (
+            <div>
+                {/* Day Header and Goal Card */}
+                <div className="bg-white p-6 md:p-8 mb-6 border border-gray-200 rounded-3xl shadow-md">
+                    <h3 className="text-2xl font-bold text-gray-800 mb-1">{dayData.day}: {dayData.title}</h3>
+                    <p className="text-sm text-gray-600 mb-4">{dayData.germanTitle}</p>
+                    <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                        <p className="text-lg font-medium text-gray-700">{dayData.goal}</p>
+                        <p className="text-xs text-gray-500 mt-1">{dayData.germanGoal}</p>
+                    </div>
+                </div>
+
+                {/* Daily Tasks Section */}
+                <div className="bg-white p-6 md:p-8 mb-6 border border-gray-200 rounded-3xl shadow-md">
+                    <div className="flex items-center gap-4 mb-4">
+                        <div className="w-12 h-12 flex items-center justify-center rounded-full text-white bg-teal-500 shadow-lg">
+                            {iconMap['exercises']}
+                        </div>
+                        <div>
+                            <p className="text-xl font-semibold text-gray-800">每日任務</p>
+                            <p className="text-sm text-gray-500">(Tagesaufgaben)</p>
+                        </div>
+                    </div>
+                    <ul className="list-disc list-inside space-y-4 text-gray-700">
+                        {dayData.tasks.map((task, idx) => (
+                            <li key={idx}>
+                                <strong className="text-gray-800">{task.type}:</strong> {task.description}
+                                <span className="block text-sm text-gray-500 italic mt-1">{task.german}</span>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+
+                {/* Supplementary Content - Words & Phrases */}
+                <div className="grid md:grid-cols-2 gap-6 mb-6">
+                    {dayData.supplementary.words && dayData.supplementary.words.length > 0 && (
+                        <div className="bg-white p-6 border border-gray-200 rounded-3xl shadow-md">
+                            <div className="flex items-center gap-4 mb-4">
+                                <div className="w-12 h-12 flex items-center justify-center rounded-full text-white bg-blue-500 shadow-lg">
+                                    {iconMap['vocab']}
+                                </div>
+                                <div>
+                                    <p className="text-xl font-semibold text-gray-800">單字卡</p>
+                                    <p className="text-sm text-gray-500">(Vokabelkarten)</p>
+                                </div>
+                            </div>
+                            <ul className="space-y-3 text-gray-700">
+                                {dayData.supplementary.words.map((word, idx) => (
+                                    <li key={idx}>
+                                        <strong className="text-gray-800">{word.word}</strong> ({word.partOfSpeech}) - {word.meaning}
+                                        <span className="block text-sm italic ml-4 text-gray-500">例句: {word.example}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                    {dayData.supplementary.phrases && dayData.supplementary.phrases.length > 0 && (
+                        <div className="bg-white p-6 border border-gray-200 rounded-3xl shadow-md">
+                            <div className="flex items-center gap-4 mb-4">
+                                <div className="w-12 h-12 flex items-center justify-center rounded-full text-white bg-purple-500 shadow-lg">
+                                    {iconMap['phrases']}
+                                </div>
+                                <div>
+                                    <p className="text-xl font-semibold text-gray-800">片語與慣用語</p>
+                                    <p className="text-sm text-gray-500">(Redewendungen)</p>
+                                </div>
+                            </div>
+                            <ul className="space-y-3 text-gray-700">
+                                {dayData.supplementary.phrases.map((phrase, idx) => (
+                                    <li key={idx}>
+                                        <strong className="text-gray-800">{phrase.phrase}</strong> ({phrase.type}) - {phrase.meaning}
+                                        <span className="block text-sm italic ml-4 text-gray-500">例句: {phrase.example}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                </div>
+
+                {/* Exercises Section */}
+                {dayData.supplementary.exercises && dayData.supplementary.exercises.length > 0 && (
+                    <div className="bg-white p-6 md:p-8 mb-6 border border-gray-200 rounded-3xl shadow-md">
+                        <div className="flex items-center gap-4 mb-4">
+                            <div className="w-12 h-12 flex items-center justify-center rounded-full text-white bg-orange-500 shadow-lg">
+                                {iconMap['exercises']}
                             </div>
                             <div>
-                                <h3 class="text-xl font-bold text-gray-700">${task.type} (${task.type === '聽' ? 'Hören' : task.type === '說' ? 'Sprechen' : task.type === '讀' ? 'Lesen' : 'Schreiben'})</h3>
-                                <p class="text-gray-600 mt-1">${task.description}</p>
-                                <div class="mt-4">
-                                    <button onclick="document.getElementById('task-answer-${dayIndex}-${index}').classList.toggle('show')" class="px-3 py-1 text-sm bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">顯示參考答案 (Musterantwort anzeigen)</button>
-                                    <div id="task-answer-${dayIndex}-${index}" class="answer bg-gray-100 border border-gray-300 rounded-md mt-2 p-2 text-sm">
-                                        <p class="font-bold text-gray-700">參考答案: (Musterantwort:)</p>
-                                        <p class="text-gray-600 mt-1">${task.sampleAnswer}</p>
-                                    </div>
-                                </div>
+                                <p className="text-xl font-semibold text-gray-800">練習題</p>
+                                <p className="text-sm text-gray-500">(Übungsaufgaben)</p>
                             </div>
                         </div>
-                    `;
-                });
-                
-                contentHTML += `</div>`;
-
-                if (dayData.supplementary && (dayData.supplementary['單字'].length > 0 || dayData.supplementary['片語與慣用語'].length > 0 || dayData.supplementary['練習'].length > 0)) {
-                    contentHTML += `
-                        <div class="text-center mb-8">
-                            <p class="text-lg text-gray-500 mt-4"></p>
-                        </div>
-                    `;
-
-                    if (dayData.supplementary['單字'].length > 0) {
-                        contentHTML += `
-                            <h3 class="text-xl font-bold text-violet-600 mb-4 flex items-center">
-                                <span class="w-10 h-10 rounded-full bg-violet-500 flex items-center justify-center mr-2">${taskIcons['單字']}</span>
-                                單字與活用卡 (Vokabel- und Anwendungskarten)
-                            </h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                        `;
-                        dayData.supplementary['單字'].forEach(item => {
-                            contentHTML += `
-                                <div class="vocab-card bg-violet-50 border border-violet-200 rounded-lg p-4">
-                                    <h4 class="text-lg font-bold text-violet-800">${item.word}</h4>
-                                    <p class="text-sm text-violet-600 mb-2">${item.partOfSpeech}｜${item.chinese}</p>
-                                    <p class="text-gray-600 text-sm">例句: ${item.example}</p>
-                                </div>
-                            `;
-                        });
-                        contentHTML += `</div>`;
-                    }
-                    
-                    if (dayData.supplementary['片語與慣用語'].length > 0) {
-                        contentHTML += `
-                            <h3 class="text-xl font-bold text-fuchsia-600 mb-4 flex items-center">
-                                <span class="w-10 h-10 rounded-full bg-fuchsia-500 flex items-center justify-center mr-2">${taskIcons['片語']}</span>
-                                常用片語與慣用語 (Redewendungen)
-                            </h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                        `;
-                        dayData.supplementary['片語與慣用語'].forEach(item => {
-                            contentHTML += `
-                                <div class="vocab-card bg-fuchsia-50 border border-fuchsia-200 rounded-lg p-4">
-                                    <h4 class="text-lg font-bold text-fuchsia-800">${item.word}</h4>
-                                    <p class="text-sm text-fuchsia-600 mb-2">${item.partOfSpeech}｜${item.chinese}</p>
-                                    <p class="text-gray-600 text-sm">例句: ${item.example}</p>
-                                </div>
-                            `;
-                        });
-                        contentHTML += `</div>`;
-                    }
-                    
-                    if (dayData.supplementary['練習'].length > 0) {
-                        contentHTML += `
-                            <h3 class="text-xl font-bold text-teal-600 mb-4 flex items-center">
-                                <span class="w-10 h-10 rounded-full bg-teal-500 flex items-center justify-center mr-2">${taskIcons['練習']}</span>
-                                練習題 (Übungsaufgaben)
-                            </h3>
-                            <div class="space-y-4">
-                        `;
-                        dayData.supplementary['練習'].forEach((item, index) => {
-                            contentHTML += `
-                                <div class="practice-card bg-teal-50 border border-teal-200 rounded-lg p-4">
-                                    <h4 class="text-lg font-semibold text-teal-800">題型: ${item.type} <span class="text-sm font-normal text-gray-500">（技能重點: ${item.skill}）</span></h4>
-                                    <p class="text-gray-700 mt-2">${item.question}</p>
-                                    <button onclick="document.getElementById('answer-${dayIndex}-${index}').classList.toggle('show')" class="mt-4 px-4 py-2 bg-teal-500 text-white rounded-md hover:bg-teal-600">顯示答案 (Antwort anzeigen)</button>
-                                    <div id="answer-${dayIndex}-${index}" class="answer bg-teal-100 border border-teal-300 rounded-md mt-4 p-3">
-                                        <p class="font-bold text-teal-800">參考答案: (Musterantwort:)</p>
-                                        <p class="text-gray-700 mt-1">${item.answer}</p>
+                        <div className="space-y-4">
+                            {dayData.supplementary.exercises.map((exercise, idx) => (
+                                <div key={idx} className="bg-gray-50 p-4 rounded-lg shadow-sm border border-gray-200">
+                                    <p className="font-medium text-gray-800">{idx + 1}. {exercise.question}</p>
+                                    <span className="block text-sm text-gray-500 italic mt-1">{exercise.german}</span>
+                                    <p className="text-xs text-gray-400 mt-1">題型: {exercise.type} / 能力指標: {exercise.skill}</p>
+                                    <div
+                                        className={`mt-2 p-4 rounded-lg bg-yellow-50 border-l-4 border-yellow-400 transition-all duration-300 ${openExercises[`${dayIndex}-${idx}`] ? 'block' : 'hidden'}`}
+                                    >
+                                        <strong className="text-sm text-gray-700">答案:</strong>
+                                        <span className="block text-sm text-gray-800">{exercise.answer}</span>
+                                        <span className="block text-sm italic text-gray-500">{exercise.germanAnswer}</span>
                                     </div>
+                                    <button
+                                        onClick={() => toggleExerciseAnswer(dayIndex, idx)}
+                                        className="mt-2 py-2 px-4 bg-gray-200 text-gray-700 text-sm font-medium rounded-full hover:bg-gray-300 transition-colors"
+                                    >
+                                        {openExercises[`${dayIndex}-${idx}`] ? '隱藏參考答案' : '顯示參考答案'}
+                                    </button>
                                 </div>
-                            `;
-                        });
-                        contentHTML += `</div>`;
-                    }
-                }
-                
-                // Add a summary block for Sunday
-                if (dayIndex === 6) {
-                    contentHTML += `
-                        <div class="mt-8">
-                            <h3 class="text-xl font-bold text-gray-700 mb-4">本週總結與反思 (Wochenrückblick und Reflexion)</h3>
-                            <div class="bg-blue-50 border-l-4 border-blue-500 rounded-xl p-6 shadow-md">
-                                <p class="text-gray-700 leading-relaxed">
-                                    In dieser Woche haben wir den Traumberuf von Nina, einer Kinder-Physiotherapeutin, intensiv kennengelernt. Wir haben gelernt, dass ihre Arbeit in einer Universitäts-Kinderklinik sehr vielseitig ist und spezielle Fähigkeiten erfordert, insbesondere bei der Arbeit mit Frühchen auf der Intensivstation. Schlüsselbegriffe wie „Mobilisation“, „Atemtherapie“ und „Lungenentzündung“ wurden vertieft. Es wurde klar, dass die Kommunikation und die Einbeziehung der Eltern ("sie ins Boot holen") von großer Bedeutung sind, um das Vertrauen der kleinen Patienten zu gewinnen und eine erfolgreiche Therapie zu gewährleisten. Obwohl die Arbeit eine große Herausforderung ("Herausforderung") darstellt, zeigt sich Ninas Leidenschaft und Engagement für ihren Beruf. Die Woche bot eine gute Gelegenheit, nicht nur Fachvokabular zu üben, sondern auch die Fähigkeit zu entwickeln, sich über komplexe Themen auszutauschen.
-                                </p>
+                            ))}
+                        </div>
+                    </div>
+                )}
+                {/* Summary section, only for Day 7 */}
+                {dayIndex === 6 && dayData.supplementary.summary && (
+                    <div className="bg-white p-6 md:p-8 mb-6 border border-gray-200 rounded-3xl shadow-md">
+                        <div className="flex items-center gap-4 mb-4">
+                            <div className="w-12 h-12 flex items-center justify-center rounded-full text-white bg-red-500 shadow-lg">
+                                {iconMap['summary']}
+                            </div>
+                            <div>
+                                <p className="text-xl font-semibold text-gray-800">總結摘要</p>
+                                <p className="text-sm text-gray-500">(Zusammenfassung)</p>
                             </div>
                         </div>
-                    `;
-                }
+                        <div dangerouslySetInnerHTML={{ __html: dayData.supplementary.summary }} />
+                    </div>
+                )}
+            </div>
+        );
+    };
 
-                contentContainer.innerHTML = contentHTML;
+    return (
+        <div className="p-4 md:p-8 bg-gray-100 min-h-screen">
+            <div className="container mx-auto bg-white rounded-3xl shadow-xl p-6 md:p-10 border border-gray-100 relative">
+                {/* 新增的「->」連結 */}
+                <a href="next-page.html" className="absolute top-6 left-6 text-gray-600 hover:text-blue-600 transition-colors duration-300 z-10">
+                    <ArrowRight className="w-8 h-8"/>
+                </a>
+                
+                <header className="text-center mb-6">
+                    <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">德國國防產業新創公司</h1>
+                    <h2 className="text-lg md:text-xl text-gray-600 font-medium">(Start-ups in der Rüstungsindustrie)</h2>
+                </header>
 
-                document.querySelectorAll('.nav-btn').forEach((btn, index) => {
-                    btn.classList.toggle('active', index === dayIndex);
-                });
-            }
+                <div className="mb-6 text-center flex flex-col items-center">
+                    {/* Audio Player */}
+                    <audio controls className="w-full max-w-lg bg-gray-100 rounded-xl p-2 mb-4 shadow-md">
+                        <source src="https://learngerman.dw.com/de/start-ups-in-der-r%C3%BCstungsindustrie/l-73548174" type="audio/mpeg" />
+                        您的瀏覽器不支援音訊元素。
+                    </audio>
+                    {/* Audio Source Link */}
+                    <a href="https://learngerman.dw.com/de/start-ups-in-der-r%C3%BCstungsindustrie/l-73548174" target="_blank" rel="noopener noreferrer" className="inline-block bg-orange-500 text-white font-bold py-2 px-4 rounded-full shadow-lg hover:bg-orange-600 transition-colors duration-300 transform hover:scale-105 text-sm">
+                        音訊來源：Deutsche Welle
+                    </a>
+                </div>
 
-            planData.forEach((item, index) => {
-                const button = document.createElement('button');
-                button.textContent = `週${item.day}`;
-                button.className = 'nav-btn px-4 py-2 rounded-full font-semibold text-gray-600 bg-gray-200 hover:bg-blue-500 hover:text-white';
-                button.addEventListener('click', () => displayPlan(index));
-                navContainer.appendChild(button);
-            });
+                {/* Day Selector */}
+                <div className="flex flex-wrap justify-center gap-2 mb-8">
+                    {learningPlanData.map((_, index) => (
+                        <button
+                            key={index}
+                            onClick={() => setCurrentDayIndex(index)}
+                            className={`py-2 px-4 rounded-full text-sm font-medium transition-colors duration-300 ${
+                                index === currentDayIndex ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                            }`}
+                        >
+                            {`第${index + 1}天`}
+                        </button>
+                    ))}
+                </div>
 
-            displayPlan(0);
-        });
-    </script>
-</body>
-</html>
+                <main id="learning-plan-container">
+                    <DayContent
+                        dayData={learningPlanData[currentDayIndex]}
+                        dayIndex={currentDayIndex}
+                        toggleAnswer={toggleExerciseAnswer}
+                        openExercises={openExercises}
+                    />
+                </main>
+            </div>
+        </div>
+    );
+}
