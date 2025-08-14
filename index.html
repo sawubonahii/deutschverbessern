@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Mic, Book, Pen, CheckSquare, MessageSquare, Search, Lightbulb, Zap, Award, BarChart3, Rocket, ArrowRight } from 'lucide-react';
+import { Mic, Book, Pen, CheckSquare, MessageSquare, Search, Lightbulb, Zap, Award, BarChart3, Rocket, ArrowRight, ArrowLeft } from 'lucide-react';
 import React from 'react';
 
 // Main App component
@@ -406,8 +406,12 @@ export default function App() {
     return (
         <div className="p-4 md:p-8 bg-gray-100 min-h-screen">
             <div className="container mx-auto bg-white rounded-3xl shadow-xl p-6 md:p-10 border border-gray-100 relative">
-                {/* 新增的「->」連結 */}
-                <a href="next-page.html" className="absolute top-6 left-6 text-gray-600 hover:text-blue-600 transition-colors duration-300 z-10">
+                
+                {/* Navigation links in top corners */}
+                <a href="#" className="absolute top-6 left-6 text-gray-600 hover:text-blue-600 transition-colors duration-300 z-10">
+                    <ArrowLeft className="w-8 h-8"/>
+                </a>
+                <a href="next-page.html" className="absolute top-6 right-6 text-gray-600 hover:text-blue-600 transition-colors duration-300 z-10">
                     <ArrowRight className="w-8 h-8"/>
                 </a>
                 
