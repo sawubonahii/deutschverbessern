@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>德國鐵路在危機中：怎麼回事？ (Deutsche Bahn in der Krise: Was ist da los?)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7fafc; /* 淺灰色背景 */
+            color: #374151;
+        }
+        .container {
+            max-width: 900px;
+        }
+        .card {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-radius: 1rem;
+            transition: transform 0.2s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+        }
+        .icon-container {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px; /* 圓形 */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        .section-subtitle {
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-weight: 400;
+        }
+        .task-list li, .words-list li {
+            list-style: none;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+        .task-list li:before {
+            content: '•'; /* 使用點作為列表標記 */
+            position: absolute;
+            left: 0;
+            color: #3b82f6; /* 藍色點 */
+            font-weight: bold;
+        }
+        .words-list li {
+            list-style: none;
+        }
+        .german-translation {
+            display: block;
+            font-style: italic;
+            color: #9ca3af;
+            margin-top: 0.25rem;
+        }
+        .answer-container {
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background-color: #f0f9ff;
+            border-radius: 0.375rem;
+            border-left: 3px solid #0ea5e9;
+            display: none; /* 預設隱藏 */
+        }
+        .answer-text {
+            color: #4b5563;
+            font-size: 0.875rem;
+        }
+        .answer-german {
+            display: block;
+            font-size: 0.875rem;
+            font-style: italic;
+            color: #9ca3af;
+        }
+        .show-answer-btn {
+            background-color: #e2e8f0;
+            color: #4b5563;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        .show-answer-btn:hover {
+            background-color: #cbd5e1;
+        }
+        .day-selector-btn {
+            background-color: #e2e8f0;
+            color: #4b5563;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        .day-selector-btn.active {
+            background-color: #3b82f6;
+            color: white;
+            font-weight: bold;
+            transform: scale(1.05);
+        }
+        .day-selector-btn:hover:not(.active) {
+            background-color: #cbd5e1;
+            transform: translateY(-2px);
+        }
+        /* Custom colors for section headers, inspired by the image */
+        .icon-listening { background-color: #10b981; /* 綠色 */ }
+        .icon-reading { background-color: #f59e0b; /* 橘色 */ }
+        .icon-speaking { background-color: #8b5cf6; /* 紫色 */ }
+        .icon-writing { background-color: #ec4899; /* 粉紅色 */ }
+        .icon-vocab { background-color: #3b82f6; /* 藍色 */ }
+        .icon-exercise { background-color: #0d9488; /* 綠松石色 */ }
+        .icon-summary { background-color: #dc2626; /* 紅色 */ }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+<div class="container mx-auto bg-white rounded-3xl shadow-xl p-6 md:p-10 border border-gray-100">
+    <header class="text-center mb-6">
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">德國鐵路在危機中：怎麼回事？</h1>
+        <h2 class="text-lg md:text-xl text-gray-600 font-medium">(Deutsche Bahn in der Krise: Was ist da los?)</h2>
+    </header>
+
+    <div class="mb-6 text-center flex flex-col items-center">
+        <!-- 音訊播放器 -->
+        <audio controls class="w-full max-w-lg bg-gray-100 rounded-xl p-2 mb-4 shadow-md">
+            <source src="https://learngerman.dw.com/de/deutsche-bahn-in-der-krise-was-ist-da-los/l-73485931" type="audio/mpeg">
+            您的瀏覽器不支援音訊元素。
+        </audio>
+        <!-- 音訊來源連結 -->
+        <a href="https://learngerman.dw.com/de/deutsche-bahn-in-der-krise-was-ist-da-los/l-73485931" target="_blank" class="inline-block bg-orange-500 text-white font-bold py-2 px-4 rounded-full shadow-lg hover:bg-orange-600 transition-colors duration-300 transform hover:scale-105 text-sm">
+            音訊來源：Deutsche Welle
+        </a>
+    </div>
+
+    <!-- 日期選擇器 -->
+    <div class="flex flex-wrap justify-center gap-2 mb-8">
+        <button id="day-1-btn" class="day-selector-btn py-2 px-4 rounded-full text-sm">第1天</button>
+        <button id="day-2-btn" class="day-selector-btn py-2 px-4 rounded-full text-sm">第2天</button>
+        <button id="day-3-btn" class="day-selector-btn py-2 px-4 rounded-full text-sm">第3天</button>
+        <button id="day-4-btn" class="day-selector-btn py-2 px-4 rounded-full text-sm">第4天</button>
+        <button id="day-5-btn" class="day-selector-btn py-2 px-4 rounded-full text-sm">第5天</button>
+        <button id="day-6-btn" class="day-selector-btn py-2 px-4 rounded-full text-sm">第6天</button>
+        <button id="day-7-btn" class="day-selector-btn py-2 px-4 rounded-full text-sm">第7天</button>
+    </div>
+
+    <main id="learning-plan-container">
+        <!-- The content for the selected day will be rendered here by JavaScript -->
+    </main>
+
+</div>
+
+<script>
+    const learningPlanData = [
+        {
+            day: '第一天',
+            title: '認識德國鐵路危機的現況',
+            germanTitle: 'Tag 1: Die aktuelle Situation der Deutschen Bahn-Krise kennenlernen',
+            goal: '理解德國鐵路延誤和取消的普遍性，以及它對乘客的影響。',
+            germanGoal: 'Ziel: Die Häufigkeit von Zugverspätungen und -ausfällen bei der Deutschen Bahn und ihre Auswirkungen auf die Passagiere verstehen.',
+            tasks: [
+                { type: '聽', description: '聽取文件第一頁的內容，了解德國鐵路延誤的現狀。', german: 'Hören Sie sich den Inhalt der ersten Seite des Dokuments an, um die aktuelle Situation der Zugverspätungen in Deutschland zu verstehen.', example: '在德國，只有62%的火車是準時的。' },
+                { type: '說', description: '練習用德文說出「火車晚點或完全取消已經是家常便飯」。', german: 'Üben Sie, auf Deutsch zu sagen: "Züge kommen zu spät oder fallen ganz aus - das ist mittlerweile Alltag."', example: '"Züge kommen zu spät oder fallen ganz aus - das ist mittlerweile Alltag."' },
+                { type: '讀', description: '閱讀文件第一頁，找出德國和瑞士火車準點率的比較數據。', german: 'Lesen Sie die erste Seite des Dokuments und finden Sie die Vergleichsdaten zur Pünktlichkeit der Züge in Deutschland und der Schweiz.', example: '德國的準點率為62%，瑞士為98-99%。' },
+                { type: '寫', description: '用中文或德文寫下您對這個數據的看法。', german: 'Schreiben Sie auf Chinesisch oder Deutsch Ihre Meinung zu diesen Zahlen auf.', example: '我對德國火車的低準點率感到驚訝，這會對乘客造成很大的困擾。' }
+            ],
+            supplementary: {
+                words: [
+                    { word: 'Verzögerung', partOfSpeech: 'n.', meaning: '延誤', example: 'Der Zug hatte eine Verzögerung von 30 Minuten.' },
+                    { word: 'pünktlich', partOfSpeech: 'adj.', meaning: '準時的', example: 'In der Schweiz fahren die Züge meistens pünktlich.' },
+                    { word: 'ausfallen', partOfSpeech: 'v.', meaning: '取消', example: 'Der Zug fällt heute aus.' },
+                    { word: 'Alltag', partOfSpeech: 'n.', meaning: '日常生活', example: 'Verspätungen sind mittlerweile Alltag bei der Bahn.' },
+                    { word: 'Entschädigung', partOfSpeech: 'n.', meaning: '賠償', example: 'Die DB musste 200 Millionen Euro Entschädigung zahlen.' }
+                ],
+                phrases: [
+                    { phrase: 'zu spät kommen', type: '片語', meaning: '遲到', example: 'Die Züge kommen zu spät.' },
+                    { phrase: 'mit Verspätung einreffen', type: '片語', meaning: '延誤抵達', example: 'Die Züge treffen regelmäßig mit Verspätung ein.' },
+                    { phrase: 'vorzeitig enden', type: '片語', meaning: '提前結束', example: 'Viele Fahrten enden vorzeitig.' }
+                ],
+                exercises: [
+                    { question: '在德國，火車延誤幾分鐘以內才被視為準時？', german: 'Wie viele Minuten Verspätung darf ein Zug in Deutschland maximal haben, um als pünktlich zu gelten?', type: '閱讀理解', skill: '理解', answer: '6分鐘以內。', germanAnswer: 'Weniger als sechs Minuten.' },
+                    { question: '2024年，德國鐵路向乘客支付了多少賠償金？', german: 'Wie viel Entschädigung musste die Deutsche Bahn im Jahr 2024 an ihre Kunden zahlen?', type: '細節理解', skill: '理解', answer: '將近2億歐元。', germanAnswer: 'Fast 200 Millionen Euro.' },
+                    { question: '將「德國的火車經常遲到」翻譯成德文。', type: '德文翻譯', skill: '寫作', answer: 'Züge in Deutschland kommen oft zu spät。', germanAnswer: 'Züge in Deutschland kommen oft zu spät.' },
+                    { question: '請解釋「mittlerweile Alltag」的中文意思。', german: 'Bitte erklären Sie die Bedeutung von "mittlerweile Alltag" auf Chinesisch.', type: '片語解釋', skill: '詞彙', answer: '現在已是家常便飯。', germanAnswer: 'Das ist jetzt eine tägliche Gewohnheit.' },
+                    { question: '請簡述為何過去有許多從德國到瑞士的直達車，而現在必須轉車？', german: 'Bitte erklären Sie kurz, warum früher viele Direktverbindungen von Deutschland in die Schweiz existierten und heute oft umgestiegen werden muss?', type: '綜合理解', skill: '分析', answer: '因為德國的火車常晚點，為了確保瑞士火車的準點率，德鐵的班次經常在邊境就結束。', germanAnswer: 'Weil deutsche Züge oft verspätet sind und die Fahrten der DB an der Grenze enden, um die Pünktlichkeit der Schweizer Züge zu gewährleisten.' }
+                ]
+            }
+        },
+        {
+            day: '第二天',
+            title: '深入探討危機的根本原因',
+            germanTitle: 'Tag 2: Vertiefung in die Grundursachen der Krise',
+            goal: '了解德國鐵路危機背後的核心問題，特別是基礎設施老化和技術過時。',
+            germanGoal: 'Ziel: Die Kernprobleme hinter der Deutschen Bahn-Krise verstehen, insbesondere die alternde Infrastruktur und die veraltete Technik.',
+            tasks: [
+                { type: '聽', description: '聽取文件第一頁後半部分，找出鐵路基礎設施面臨的問題。', german: 'Hören Sie sich den zweiten Teil der ersten Seite des Dokuments an und finden Sie die Probleme mit der Bahninfrastruktur heraus.', example: '鐵軌、道岔和信號系統已經很老舊，有些甚至來自19世紀。' },
+                { type: '說', description: '練習用德文說出「鐵軌和信號系統已經完全磨損」。', german: 'Üben Sie, auf Deutsch zu sagen: "Gleise und Stellwerke sind komplett verschlissen."', example: '"Gleise, Weichen und Stellwerke sind alt und komplett verschlissen."' },
+                { type: '讀', description: '閱讀文件第一頁，找出鐵路基礎設施的年齡和技術問題。', german: 'Lesen Sie die erste Seite des Dokuments, um das Alter der Bahninfrastruktur und die technischen Probleme zu identifizieren.', example: '部分設備來自19世紀，無法與新數位技術兼容。' },
+                { type: '寫', description: '寫下為什麼老舊的基礎設施會導致火車延誤。', german: 'Schreiben Sie auf, warum eine alte Infrastruktur zu Zugverspätungen führt.', example: '老舊的設備容易故障且難以維修，導致火車必須減速或停駛。' }
+            ],
+            supplementary: {
+                words: [
+                    { word: 'Krise', partOfSpeech: 'n.', meaning: '危機', example: 'Die Deutsche Bahn befindet sich in der größten Krise seit 30 Jahren.' },
+                    { word: 'Gleise', partOfSpeech: 'n. (pl.)', meaning: '鐵軌', example: 'Die Gleise sind alt und verschlissen.' },
+                    { word: 'Weichen', partOfSpeech: 'n. (pl.)', meaning: '道岔', example: 'Defekte Weichen können zu Zugausfällen führen.' },
+                    { word: 'Stellwerke', partOfSpeech: 'n. (pl.)', meaning: '信號系統', example: 'Viele Stellwerke stammen aus dem 19. Jahrhundert.' },
+                    { word: 'verschlissen', partOfSpeech: 'adj.', meaning: '磨損的', example: 'Die technischen Anlagen sind komplett verschlissen.' }
+                ],
+                phrases: [
+                    { phrase: 'seit 30 Jahren', type: '片語', meaning: '30年來', example: 'Die Bahn ist in der größten Krise seit 30 Jahren.' },
+                    { phrase: 'kaum noch zu reparieren', type: '片語', meaning: '幾乎無法再修理', example: 'Die alten Anlagen sind kaum noch zu reparieren.' },
+                    { phrase: 'nicht funktionieren mit', type: '片語', meaning: '無法與…運作', example: 'Die alte Technik funktioniert nicht mit der neuen digitalen Technik.' }
+                ],
+                exercises: [
+                    { question: '根據文件，誰說德國鐵路正處於「30年來最大的危機」？', german: 'Wer sagt laut dem Dokument, dass sich die Deutsche Bahn in der "größten Krise seit 30 Jahren" befindet?', type: '細節理解', skill: '理解', answer: '德國鐵路總裁 Richard Lutz。', germanAnswer: 'Bahnchef Richard Lutz.' },
+                    { question: '為什麼老舊的技術設備無法與未來的技術兼容？', german: 'Warum kann die alte Technik nicht mit der neuen digitalen Technik funktionieren?', type: '閱讀理解', skill: '理解', answer: '因為它們太老舊且已經完全磨損，無法修復。', germanAnswer: 'Sie sind zu alt und komplett verschlissen und kaum noch zu reparieren.' },
+                    { question: '將「許多信號系統來自19世紀」翻譯成德文。', type: '德文翻譯', skill: '寫作', answer: 'Viele Stellwerke stammen aus dem 19. Jahrhundert。', germanAnswer: 'Viele Stellwerke stammen aus dem 19. Jahrhundert.' },
+                    { question: '請解釋「komplett verschlissen」的中文意思。', german: 'Bitte erklären Sie die Bedeutung von "komplett verschlissen" auf Chinesisch.', type: '片語解釋', skill: '詞彙', answer: '完全磨損的。', germanAnswer: 'Völlig abgenutzt.' },
+                    { question: '你認為基礎設施老化對一個國家的交通系統有什麼長遠影響？', german: 'Welche langfristigen Auswirkungen könnte eine veraltete Infrastruktur auf das Verkehrssystem eines Landes haben?', type: '延伸思考', skill: '批判性思考', answer: '（此為開放式問題，提供德文答案範例）', germanAnswer: 'Veraltete Infrastruktur kann zu häufigen Ausfällen, langsameren Verbindungen und höheren Wartungskosten führen, was die Wettbewerbsfähigkeit des Landes beeinträchtigt.' }
+                ]
+            }
+        },
+        {
+            day: '第三天',
+            title: '「全面翻新」計畫的挑戰與成本',
+            germanTitle: 'Tag 3: Herausforderungen und Kosten des "Generalsanierungs"-Plans',
+            goal: '理解德國鐵路「全面翻新」計畫的啟動、成本以及面臨的挑戰。',
+            germanGoal: 'Ziel: Den Start, die Kosten und die Herausforderungen des "Generalsanierungs"-Plans der Deutschen Bahn verstehen.',
+            tasks: [
+                { type: '聽', description: '聽取文件第一頁和第二頁的內容，找出全面翻新計畫的起點和花費。', german: 'Hören Sie sich den Inhalt der ersten und zweiten Seite des Dokuments an, um den Start und die Kosten des Generalsanierungsplans zu finden.', example: '第一個工程是在法蘭克福和曼海姆之間，花了15億歐元。' },
+                { type: '說', description: '練習用德文說出「一項大型的全面翻新計畫在2024年啟動」。', german: 'Üben Sie, auf Deutsch zu sagen: "Eine große Generalsanierung startete 2024."', example: '"Deshalb startete 2024 eine große Generalsanierung."' },
+                { type: '讀', description: '閱讀文件第二頁，找出聯邦審計局對該計畫的批評。', german: 'Lesen Sie die zweite Seite des Dokuments und finden Sie die Kritik des Bundesrechnungshofs am Plan heraus.', example: '聯邦審計局認為，政府不能只給錢，還需要一個清晰的總體規劃。' },
+                { type: '寫', description: '寫下為什麼聯邦審計局對高昂的成本提出質疑。', german: 'Schreiben Sie auf, warum der Bundesrechnungshof die hohen Kosten in Frage stellt.', example: '因為第一個工程的成本比預期高出了一倍，這讓他們對後續的工程感到擔憂。' }
+            ],
+            supplementary: {
+                words: [
+                    { word: 'Generalsanierung', partOfSpeech: 'n.', meaning: '全面翻新', example: 'Die Generalsanierung soll bis 2036 dauern.' },
+                    { word: 'Baustelle', partOfSpeech: 'n.', meaning: '施工地點', example: 'Die erste Baustelle war die Strecke zwischen Frankfurt und Mannheim.' },
+                    { word: 'kontrollieren', partOfSpeech: 'v.', meaning: '控制、檢查', example: 'Der Bundesrechnungshof kontrolliert die Kosten.' },
+                    { word: 'notwendig', partOfSpeech: 'adj.', meaning: '必要的', example: 'Die Arbeiten müssen notwendig und wirtschaftlich sein.' },
+                    { word: 'wirtschaftlich', partOfSpeech: 'adj.', meaning: '經濟的、有經濟效益的', example: 'Der Bundesrechnungshof prüft, ob die Arbeiten wirtschaftlich sind.' }
+                ],
+                phrases: [
+                    { phrase: 'bis 2036 dauern', type: '片語', meaning: '持續到2036年', example: 'Die Sanierung soll bis 2036 dauern.' },
+                    { phrase: 'doppelt so viel wie geplant', type: '片語', meaning: '是計畫的兩倍', example: 'Die Kosten waren doppelt so viel wie geplant.' },
+                    { phrase: 'Struktur prüfen', type: '片語', meaning: '審查結構', example: 'Es gehört auch dazu, die Struktur des Konzerns zu prüfen.' }
+                ],
+                exercises: [
+                    { question: '第一個全面翻新工程在哪兩座城市之間進行？', german: 'Zwischen welchen beiden Städten fand die erste Generalsanierung statt?', type: '細節理解', skill: '理解', answer: '法蘭克福和曼海姆。', germanAnswer: 'Zwischen Frankfurt und Mannheim.' },
+                    { question: '根據文件，這次工程的花費比預期多了多少？', german: 'Wie viel mehr als geplant hat das erste Projekt laut dem Dokument gekostet?', type: '細節理解', skill: '理解', answer: '多了一倍，總共15億歐元。', germanAnswer: 'Doppelt so viel, insgesamt über 1,5 Milliarden Euro.' },
+                    { question: '將「聯邦審計局控制著成本」翻譯成德文。', type: '德文翻譯', skill: '寫作', answer: 'Der Bundesrechnungshof kontrolliert die Kosten。', germanAnswer: 'Der Bundesrechnungshof kontrolliert die Kosten.' },
+                    { question: '請解釋「klare Gesamtplanung」的中文意思。', german: 'Bitte erklären Sie die Bedeutung von "klare Gesamtplanung" auf Chinesisch.', type: '片語解釋', skill: '詞彙', answer: '清晰的總體規劃。', germanAnswer: 'Ein klarer Gesamtplan.' },
+                    { question: '你認為為什麼政府不能「只是給錢」就能解決問題？', german: 'Warum glauben Sie, dass die Regierung die Probleme nicht lösen kann, indem sie "einfach nur Geld gibt"?', type: '延伸思考', skill: '批判性思考', answer: '（此為開放式問題，提供德文答案範例）', germanAnswer: 'Geld allein löst nicht die grundlegenden Probleme der Konzernstruktur und der ineffizienten Planung. Es braucht eine klare Strategie und verantwortungsvolle Umsetzung.' }
+                ]
+            }
+        },
+        {
+            day: '第四天',
+            title: '聯邦審計局的警告與建議',
+            germanTitle: 'Tag 4: Warnungen und Empfehlungen des Bundesrechnungshofs',
+            goal: '理解聯邦審計局提出的警告，並分析其對未來鐵路發展的建議。',
+            germanGoal: 'Ziel: Die Warnungen des Bundesrechnungshofs verstehen und seine Empfehlungen für die zukünftige Entwicklung der Bahn analysieren.',
+            tasks: [
+                { type: '聽', description: '聽取文件第二頁，找出聯邦審計局除了費用之外，還提出了哪些警告。', german: 'Hören Sie sich die zweite Seite des Dokuments an und finden Sie heraus, welche Warnungen der Bundesrechnungshof neben den Kosten noch ausspricht.', example: '政府不能只給錢，還需要證明這些工程是必要的且具備經濟效益。' },
+                { type: '說', description: '練習用德文說出「必須有一個清晰的總體規劃」。', german: 'Üben Sie, auf Deutsch zu sagen: "Es muss eine klare Gesamtplanung geben."', example: '"Es muss eine klare Gesamtplanung geben."' },
+                { type: '讀', description: '閱讀文件第二頁，找出聯邦審計局提出的具體要求。', german: 'Lesen Sie die zweite Seite des Dokuments und finden Sie die spezifischen Forderungen des Bundesrechnungshofs heraus.', example: '需要證明工程的必要性和經濟效益，並審查德國鐵路集團的結構。' },
+                { type: '寫', description: '寫下你認為「審查集團結構」可能意味著什麼。', german: 'Schreiben Sie auf, was "die Struktur des Konzerns zu prüfen" bedeuten könnte.', example: '這可能意味著要檢討公司的管理方式、組織架構或業務流程，看是否有改善的空間。' }
+            ],
+            supplementary: {
+                words: [
+                    { word: 'Bundesrechnungshof', partOfSpeech: 'n.', meaning: '聯邦審計局', example: 'Der Bundesrechnungshof kontrolliert die Staatsausgaben.' },
+                    { word: 'Regierung', partOfSpeech: 'n.', meaning: '政府', example: 'Die Regierung muss die Probleme lösen.' },
+                    { word: 'dauerhaft', partOfSpeech: 'adj.', meaning: '永久的、持久的', example: 'Die Probleme müssen dauerhaft gelöst werden.' },
+                    { word: 'Gesamtplanung', partOfSpeech: 'n.', meaning: '總體規劃', example: 'Eine klare Gesamtplanung ist erforderlich.' },
+                    { word: 'Struktur', partOfSpeech: 'n.', meaning: '結構', example: 'Die Struktur des Konzerns muss geprüft werden.' }
+                ],
+                phrases: [
+                    { phrase: 'es geht so nicht', type: '片語', meaning: '這樣下去不行', example: 'Laut dem Bundesrechnungshof geht das so aber nicht.' },
+                    { phrase: 'Geld geben und erwarten', type: '片語', meaning: '給錢然後期望', example: 'Die Regierung kann nicht einfach nur Geld geben und erwarten, dass die Probleme gelöst werden.' },
+                    { phrase: 'klare Gesamtplanung geben', type: '片語', meaning: '有一個清晰的總體規劃', example: 'Es muss eine klare Gesamtplanung geben.' }
+                ],
+                exercises: [
+                    { question: '根據文件，聯邦審計局對給予額外政府資金設定了什麼條件？', german: 'Welche Bedingung stellt der Bundesrechnungshof für weitere staatliche Gelder für die Sanierungen?', type: '細節理解', skill: '理解', answer: '交通部必須證明工程的必要性和經濟效益。', germanAnswer: 'Das Verkehrsministerium muss beweisen, dass die Arbeiten notwendig und wirtschaftlich sind.' },
+                    { question: '聯邦審計局認為，除了給錢之外，還必須採取什麼措施來永久解決問題？', german: 'Welche Maßnahme muss laut dem Bundesrechnungshof neben der Geldvergabe ergriffen werden, um die Probleme dauerhaft zu lösen?', type: '閱讀理解', skill: '理解', answer: '必須有一個清晰的總體規劃，並審查集團的結構。', germanAnswer: 'Es muss eine klare Gesamtplanung geben, und die Struktur des Konzerns muss geprüft werden.' },
+                    { question: '將「永久解決問題」翻譯成德文。', type: '德文翻譯', skill: '寫作', answer: 'Probleme dauerhaft lösen。', germanAnswer: 'Probleme dauerhaft lösen.' },
+                    { question: '請解釋「die Struktur des Konzerns zu prüfen」的中文意思。', german: 'Bitte erklären Sie die Bedeutung von "die Struktur des Konzerns zu prüfen" auf Chinesisch.', type: '片語解釋', skill: '詞彙', answer: '審查集團的結構。', germanAnswer: 'Die Konzernstruktur überprüfen.' },
+                    { question: '你認為審查公司結構對解決問題有幫助嗎？為什麼？', german: 'Glauben Sie, dass die Überprüfung der Konzernstruktur helfen kann, die Probleme zu lösen? Warum?', type: '延伸思考', skill: '批判性思考', answer: '（此為開放式問題，提供德文答案範例）', germanAnswer: 'Ja, eine Überprüfung der Struktur kann helfen, Ineffizienzen und bürokratische Hürden zu identifizieren und zu beseitigen. Dies kann zu schnelleren Entscheidungen und besseren Ergebnissen führen.' }
+                ]
+            }
+        },
+        {
+            day: '第五天',
+            title: '綜合分析與比較',
+            germanTitle: 'Tag 5: Umfassende Analyse und Vergleich',
+            goal: '綜合文件中的所有資訊，比較德國與瑞士鐵路的運營差異。',
+            germanGoal: 'Ziel: Alle Informationen im Dokument zusammenführen und die betrieblichen Unterschiede zwischen den deutschen und schweizerischen Bahnen vergleichen.',
+            tasks: [
+                { type: '聽', description: '重新聽取所有內容，特別關注德國與瑞士在火車運營上的差異。', german: 'Hören Sie sich den gesamten Inhalt erneut an und konzentrieren Sie sich dabei auf die Unterschiede im Bahnbetrieb zwischen Deutschland und der Schweiz.', example: '瑞士火車的準點率高得多，且允許較短的延誤才能繼續行駛。' },
+                { type: '說', description: '練習用德文向朋友解釋德鐵和瑞士鐵路之間的主要區別。', german: 'Üben Sie, einem Freund auf Deutsch die Hauptunterschiede zwischen der DB und den SBB zu erklären.', example: '"In Deutschland sind Züge oft verspätet, aber in der Schweiz sind sie sehr pünktlich."' },
+                { type: '讀', description: '再次閱讀文件，找出導致德國鐵路表現不佳的所有原因。', german: 'Lesen Sie das Dokument erneut und identifizieren Sie alle Gründe, die zur schlechten Leistung der Deutschen Bahn führen.', example: '老舊的基礎設施、昂貴且緩慢的翻新計畫、缺乏總體規劃。' },
+                { type: '寫', description: '寫一篇短文，比較德國和瑞士鐵路的運營模式，並分析優缺點。', german: 'Schreiben Sie einen kurzen Aufsatz, in dem Sie die Betriebsmodelle der deutschen und schweizerischen Bahnen vergleichen und die Vor- und Nachteile analysieren.', example: '瑞士的嚴格準點率政策確保了高效率，但可能也犧牲了一些彈性。' }
+            ],
+            supplementary: {
+                words: [
+                    { word: 'Direktverbindungen', partOfSpeech: 'n. (pl.)', meaning: '直達車', example: 'Früher gab es viele Direktverbindungen von Deutschland in die Schweiz.' },
+                    { word: 'Passagiere', partOfSpeech: 'n. (pl.)', meaning: '乘客', example: 'Die Passagiere müssen oft umsteigen.' },
+                    { word: 'pünktlich bleiben', type: '片語', meaning: '保持準時', example: 'Damit die Schweizer Züge pünktlich bleiben.' },
+                    { phrase: 'schlimmer werden', type: '片語', meaning: '變得更糟', example: 'Bei extremem Wetter wird es noch schlimmer.' },
+                    { word: 'Kritik', partOfSpeech: 'n.', meaning: '批評', example: 'Es gibt viel Kritik an der Sanierung.' }
+                ],
+                phrases: [
+                    { phrase: 'Im Vergleich zu', type: '片語', meaning: '與…相比', example: 'Im Vergleich zur Schweiz ist die Pünktlichkeit in Deutschland viel schlechter.' },
+                    { phrase: 'dennoch', type: '連詞', meaning: '儘管如此', example: 'Die Kosten sind hoch, dennoch ist die Sanierung notwendig.' },
+                    { phrase: 'mit weniger als', type: '片語', meaning: '少於…', example: 'Ein Zug darf nur mit weniger als sechs Minuten Verspätung weiterfahren.' }
+                ],
+                exercises: [
+                    { question: '德國鐵路延誤的兩個主要原因是什麼？', german: 'Was sind die zwei Hauptgründe für die Zugverspätungen bei der Deutschen Bahn?', type: '總結', skill: '綜合', answer: '老舊的基礎設施和缺乏有效的總體規劃。', germanAnswer: 'Die veraltete Infrastruktur und das Fehlen einer klaren Gesamtplanung.' },
+                    { question: '將「這項計畫比預期花費了更多的錢」翻譯成德文。', type: '德文翻譯', skill: '寫作', answer: 'Dieser Plan hat mehr gekostet, als erwartet。', germanAnswer: 'Dieser Plan hat mehr gekostet, als erwartet.' },
+                    { question: '請解釋「umsteigen」的中文意思。', german: 'Bitte erklären Sie die Bedeutung von "umsteigen" auf Chinesisch.', type: '詞彙', skill: '理解', answer: '轉車。', germanAnswer: 'Umsteigen.' },
+                    { question: '你認為瑞士的火車準點率為何如此高？', german: 'Warum, glauben Sie, ist die Pünktlichkeit der Züge in der Schweiz so hoch?', type: '延伸思考', skill: '批判性思考', answer: '（此為開放式問題，提供德文答案範例）', germanAnswer: 'Die hohe Pünktlichkeit in der Schweiz liegt vermutlich an strengeren Vorschriften, einer moderneren Infrastruktur und einer effizienteren Betriebsplanung.' },
+                    { question: '請簡述一個讓你印象深刻的德國火車延誤經驗。', german: 'Bitte beschreiben Sie eine beeindruckende Erfahrung, die Sie mit einer Zugverspätung in Deutschland gemacht haben.', type: '個人經驗分享', skill: '口語', answer: '（此為開放式問題，鼓勵自由發揮。）', germanAnswer: '(Dies ist eine offene Frage, freie Entfaltung wird gefördert.)' }
+                ]
+            }
+        },
+        {
+            day: '第六天',
+            title: '解決方案與未來展望',
+            germanTitle: 'Tag 6: Lösungen und Zukunftsaussichten',
+            goal: '探討解決德國鐵路危機的可能方案，並對其未來發展做出預測。',
+            germanGoal: 'Ziel: Mögliche Lösungen für die Deutsche Bahn-Krise diskutieren und eine Prognose für die zukünftige Entwicklung abgeben.',
+            tasks: [
+                { type: '聽', description: '再次聆聽文件，找出政府和德國鐵路目前正在採取或計畫採取的措施。', german: 'Hören Sie sich das Dokument erneut an und finden Sie heraus, welche Maßnahmen die Regierung und die Deutsche Bahn aktuell ergreifen oder planen.', example: '他們已經啟動了全面翻新計畫，並正在審查集團結構。' },
+                { type: '說', description: '練習用德文向一位官員提出你的解決方案，以改善鐵路系統。', german: 'Üben Sie, einem Beamten auf Deutsch Ihre Lösungsvorschläge zur Verbesserung des Bahnsystems zu unterbreiten.', example: '"Ich schlage vor, kleinere, schnellere Sanierungsprojekte durchzuführen..."' },
+                { type: '讀', description: '在網路上搜尋德國鐵路關於「數字化」（Digitalisierung）的最新計畫。', german: 'Suchen Sie online nach den neuesten Plänen der Deutschen Bahn zur "Digitalisierung".', example: '我發現他們正在開發一個新的數位信號系統來取代舊設備。' },
+                { type: '寫', description: '寫一封信給德國交通部，建議他們如何更有效地使用翻新預算。', german: 'Schreiben Sie einen Brief an das deutsche Verkehrsministerium mit Vorschlägen, wie die Sanierungsbudgets effektiver eingesetzt werden könnten.', example: 'Sehr geehrtes Verkehrsministerium, ich möchte vorschlagen, dass Sie die Sanierung in kleinere, überschaubare Projekte aufteilen...' }
+            ],
+            supplementary: {
+                words: [
+                    { word: 'Lösung', partOfSpeech: 'n.', meaning: '解決方案', example: 'Die Regierung sucht nach einer dauerhaften Lösung.' },
+                    { word: 'Zukunft', partOfSpeech: 'n.', meaning: '未來', example: 'Die neue Technik soll in Zukunft ausschließlich eingesetzt werden.' },
+                    { word: 'Strategie', partOfSpeech: 'n.', meaning: '策略', example: 'Die Regierung braucht eine neue Strategie.' },
+                    { word: 'Budget', partOfSpeech: 'n.', meaning: '預算', example: 'Das Budget für die Sanierung ist sehr hoch.' },
+                    { word: 'Effizienz', partOfSpeech: 'n.', meaning: '效率', example: 'Die Effizienz der Bahn muss verbessert werden.' }
+                ],
+                phrases: [
+                    { phrase: 'es gibt viel Kritik', type: '片語', meaning: '有很多批評', example: 'Es gibt viel Kritik an der Deutschen Bahn.' },
+                    { phrase: 'in Zukunft', type: '片語', meaning: '未來', example: 'Die digitale Technik wird in Zukunft eingesetzt.' },
+                    { phrase: 'neue Wege beschreiten', type: '慣用語', meaning: '開創新道路', example: 'Wir müssen neue Wege beschreiten, um die Probleme zu lösen.' }
+                ],
+                exercises: [
+                    { question: '根據文件，有什麼方法可以使德國鐵路的工程變得「經濟」？', german: 'Welche Möglichkeiten gibt es laut dem Dokument, um die Arbeiten bei der Deutschen Bahn "wirtschaftlich" zu gestalten?', type: '閱讀理解', skill: '理解', answer: '必須有清晰的總體規劃，並證明這些工程是必要的。', germanAnswer: 'Eine klare Gesamtplanung und der Nachweis der Notwendigkeit der Arbeiten.' },
+                    { question: '將「德國鐵路需要一個新的策略」翻譯成德文。', type: '德文翻譯', skill: '寫作', answer: 'Die Deutsche Bahn braucht eine neue Strategie。', germanAnswer: 'Die Deutsche Bahn braucht eine neue Strategie.' },
+                    { question: '請解釋「Digitalisierung」的中文意思。', german: 'Bitte erklären Sie die Bedeutung von "Digitalisierung" auf Chinesisch.', type: '詞彙', skill: '理解', answer: '數位化。', germanAnswer: 'Digitalisierung.' },
+                    { question: '你認為在解決德國鐵路問題上，技術創新和政策改革哪個更重要？', german: 'Was ist Ihrer Meinung nach wichtiger, um die Probleme der Deutschen Bahn zu lösen: technologische Innovationen oder politische Reformen?', type: '延伸思考', skill: '批判性思考', answer: '（此為開放式問題，提供德文答案範例）', germanAnswer: 'Beides ist wichtig. Technologische Innovationen verbessern die Infrastruktur, aber ohne politische Reformen, die eine effiziente Planung und Finanzierung gewährleisten, können diese Innovationen nicht umgesetzt werden.' },
+                    { question: '寫下你對德國鐵路未來十年的預測。', german: 'Schreiben Sie Ihre Prognose für die Deutsche Bahn in den nächsten zehn Jahren auf.', type: '創造性寫作', skill: '創造力', answer: '（此為開放式問題，提供德文答案範例）', germanAnswer: 'Ich prognostiziere, dass die Deutsche Bahn in den nächsten zehn Jahren ihre Pünktlichkeit durch die Generalsanierung schrittweise verbessern wird, aber weiterhin mit hohen Kosten und strukturellen Herausforderungen zu kämpfen hat.' }
+                ]
+            }
+        },
+        {
+            day: '第七天',
+            title: '全面回顧與反思',
+            germanTitle: 'Tag 7: Umfassende Überprüfung und Reflexion',
+            goal: '回顧過去六天的學習內容，並形成對德國鐵路危機的個人觀點。',
+            germanGoal: 'Ziel: Die Lerninhalte der letzten sechs Tage rekapitulieren und eine persönliche Meinung zur Deutschen Bahn-Krise entwickeln.',
+            tasks: [
+                { type: '聽', description: '完整地再聽一次音訊，檢查是否所有細節都能理解。', german: 'Hören Sie das Audio noch einmal komplett an und überprüfen Sie, ob Sie alle Details verstehen können.', example: '我現在可以不看文字稿就聽懂大部分內容。' },
+                { type: '說', description: '整理自己的所有觀點，練習向他人介紹這個議題，並回答可能的問題。', german: 'Strukturieren Sie Ihre eigenen Argumente und üben Sie, das Thema zu präsentieren und mögliche Fragen zu beantworten.', example: '"Die größte Herausforderung für die Deutsche Bahn ist die alte Infrastruktur und die Bürokratie..."' },
+                { type: '讀', description: '再次瀏覽文件，特別關注那些在學習初期不熟悉的詞彙或句子。', german: 'Überfliegen Sie das Dokument erneut und konzentrieren Sie sich dabei auf Vokabeln und Sätze, die Ihnen zu Beginn unbekannt waren.', example: '例如：Bundesrechnungshof, Generalsanierung, verschlissen。' },
+                { type: '寫', description: '寫一篇綜合報告，總結整個學習計畫的收穫，並闡述你對德國鐵路未來的看法和建議。', german: 'Schreiben Sie einen umfassenden Bericht, in dem Sie die Lernergebnisse der gesamten Woche zusammenfassen und Ihre Ansichten und Vorschläge zur Zukunft der Deutschen Bahn darlegen.', example: '經過這七天的學習，我認為德國鐵路的問題根源在於長期的投資不足和管理不善，未來的成功將取決於政府的決心和有效的總體規劃。' }
+            ],
+            supplementary: {
+                words: [
+                    { word: 'Reflexion', partOfSpeech: 'n.', meaning: '反思', example: 'Eine gründliche Reflexion ist für das Lernen wichtig.' },
+                    { word: 'Herausforderung', partOfSpeech: 'n.', meaning: '挑戰', example: 'Die größte Herausforderung ist die Finanzierung.' },
+                    { word: 'Perspektive', partOfSpeech: 'n.', meaning: '觀點', example: 'Ich habe eine neue Perspektive auf das Thema gewonnen.' },
+                    { word: 'Maßnahmen', partOfSpeech: 'n. (pl.)', meaning: '措施', example: 'Es müssen effektive Maßnahmen ergriffen werden.' },
+                    { word: 'Zusammenhang', partOfSpeech: 'n.', meaning: '關聯、上下文', example: 'Ich verstehe jetzt den Zusammenhang zwischen den Problemen.' }
+                ],
+                phrases: [
+                    { phrase: 'unter die Lupe nehmen', type: '慣用語', meaning: '仔細審查', example: 'Wir müssen die Probleme der Bahn unter die Lupe nehmen.' },
+                    { phrase: 'insgesamt', type: '副詞', meaning: '總體來說', example: 'Insgesamt war die Woche sehr lehrreich.' },
+                    { phrase: 'sich einen Überblick verschaffen', type: '片語', meaning: '獲得一個總體概述', example: 'Ich habe mir einen guten Überblick über das Thema verschafft.' }
+                ],
+                exercises: [
+                    { question: '用一句話總結你對德國鐵路危機的總體理解。', german: 'Fassen Sie Ihr gesamtes Verständnis der Deutschen Bahn-Krise in einem Satz zusammen.', type: '總結', skill: '綜合', answer: '（此為開放式問題，提供德文答案範例）', germanAnswer: 'Die Deutsche Bahn steht vor einer Krise, die durch veraltete Infrastruktur und hohe Sanierungskosten verursacht wird und eine umfassende strategische Neuplanung erfordert.' },
+                    { question: '將「德國交通部必須採取行動」翻譯成德文。', type: '德文翻譯', skill: '寫作', answer: 'Das deutsche Verkehrsministerium muss handeln。', germanAnswer: 'Das deutsche Verkehrsministerium muss handeln.' },
+                    { question: '請解釋「es geht so nicht」的中文意思。', german: 'Bitte erklären Sie die Bedeutung von "es geht so nicht" auf Chinesisch.', type: '片語解釋', skill: '詞彙', answer: '這樣下去不行。', germanAnswer: 'So geht es nicht weiter.' },
+                    { question: '你認為這份文件主要是在表達哪種情緒？', german: 'Welche Stimmung vermittelt das Dokument Ihrer Meinung nach hauptsächlich?', type: '語氣分析', skill: '分析', answer: '（此為開放式問題，提供德文答案範例）', germanAnswer: 'Das Dokument vermittelt eine kritische und besorgte Stimmung hinsichtlich der aktuellen Lage der Deutschen Bahn und der Herausforderungen der Generalsanierung.' },
+                    { question: '如果可以，你希望向德國鐵路總裁提出什麼建議？', german: 'Wenn Sie könnten, welche Empfehlung würden Sie dem Chef der Deutschen Bahn geben?', type: '創造性寫作', skill: '批判性思考', answer: '（此為開放式問題，提供德文答案範例）', germanAnswer: 'Ich würde dem Bahnchef empfehlen, die Sanierungsprojekte stärker zu dezentralisieren und die Kommunikation über Fortschritte transparenter zu gestalten.' }
+                ],
+                summary: `
+                    <div class="p-4 bg-red-50 rounded-lg border border-red-200">
+                        <h4 class="text-lg font-bold text-gray-700 mb-2">總結摘要 (Zusammenfassung)</h4>
+                        <p class="text-gray-800 leading-relaxed">
+                            Die Deutsche Bahn steht vor der größten Krise ihrer jüngeren Geschichte, geprägt durch chronische Verspätungen und Zugausfälle. Die Ursache liegt primär in einer massiv veralteten Infrastruktur: Gleise, Weichen und Stellwerke sind oft über hundert Jahre alt und komplett verschlissen. Dies spiegelt sich in einer Pünktlichkeitsrate von lediglich 62% wider, ein deutlicher Unterschied zu den fast 99% in der Schweiz. Um dieser Situation entgegenzuwirken, hat die Bahn 2024 eine umfassende Generalsanierung eingeleitet. Das erste Großprojekt auf der Strecke Frankfurt-Mannheim kostete jedoch mit über 1,5 Milliarden Euro doppelt so viel wie veranschlagt. Diese Kostenexplosion hat den Bundesrechnungshof auf den Plan gerufen. Die Prüfungsinstanz mahnt, dass die Regierung nicht blindlings Gelder bereitstellen darf, sondern eine wirtschaftliche Rechtfertigung für die Sanierungsarbeiten sowie eine klare Gesamtplanung verlangen muss. Langfristig ist eine bloße Reparatur der Vergangenheit nicht ausreichend. Die Bahn muss ihre Konzernstruktur kritisch hinterfragen und eine nachhaltige Strategie entwickeln, die digitale Technologien integriert, um dauerhaft zuverlässige Mobilität in Deutschland zu sichern. Nur so kann das Vertrauen der Kunden zurückgewonnen werden.
+                        </p>
+                    </div>
+                `
+            }
+        }
+    ];
+
+    const container = document.getElementById('learning-plan-container');
+    const dayButtons = [
+        document.getElementById('day-1-btn'),
+        document.getElementById('day-2-btn'),
+        document.getElementById('day-3-btn'),
+        document.getElementById('day-4-btn'),
+        document.getElementById('day-5-btn'),
+        document.getElementById('day-6-btn'),
+        document.getElementById('day-7-btn')
+    ];
+
+    let currentDayIndex = 0;
+
+    // Helper function to create SVG icons
+    const createIcon = (dPath) => {
+        return `<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="${dPath}"></path></svg>`;
+    };
+    
+    const iconPaths = {
+        'listen': "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM9 10h2V7h2v3h2v4h-2v3h-2v-3H9v-4z", // Microphone icon
+        'speak': "M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z", // User icon, for speaking
+        'read': "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z", // Info/book icon
+        'write': "M14.06 9.04l-7.14 7.14-1.95-1.95 7.14-7.14 1.95 1.95zm-9.04 7.14L14.06 7.18 16.88 10 7.84 19.04l-3.82 3.82-1.95-1.95L7.84 19.04l-3.82-3.82zM12 10l-6.84 6.84L5.16 18l-1.95-1.95 6.84-6.84L12 10zM17 3c-.28 0-.53.11-.7.29l-1.75 1.75 3.5 3.5 1.75-1.75c.18-.18.29-.43.29-.72s-.11-.53-.29-.71l-2.04-2.04c-.18-.18-.43-.29-.72-.29z", // Edit/pen icon
+        'vocab': "M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z", // Search/magnifying glass
+        'phrases': "M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM8 14H6v-2h2v2zm3 0h-2v-2h2v2zm3 0h-2v-2h2v2z", // Chat bubble
+        'exercises': "M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10H7v-2h10v2zm0-4H7V7h10v2z", // Checkmark list
+    };
+
+    const renderDay = (dayIndex) => {
+        const dayData = learningPlanData[dayIndex];
+        let htmlContent = '';
+
+        // 日期標題和目標
+        htmlContent += `
+            <div class="card bg-white p-6 md:p-8 mb-6 border border-gray-200">
+                <h3 class="text-2xl font-bold text-gray-800 mb-1">${dayData.day}: ${dayData.title}</h3>
+                <p class="text-sm text-gray-600 mb-4">${dayData.germanTitle}</p>
+                <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <p class="text-lg font-medium text-gray-700">${dayData.goal}</p>
+                    <p class="text-xs text-gray-500 mt-1">${dayData.germanGoal}</p>
+                </div>
+            </div>
+        `;
+        
+        // 每日任務
+        if (dayData.tasks && dayData.tasks.length > 0) {
+            htmlContent += `
+                <div class="card bg-white p-6 md:p-8 mb-6 border border-gray-200">
+                    <div class="section-header mb-4">
+                        <div class="icon-container bg-green-500">
+                            ${createIcon(iconPaths.exercises)}
+                        </div>
+                        <div>
+                            <p class="section-title">每日任務</p>
+                            <p class="section-subtitle">(Tagesaufgaben)</p>
+                        </div>
+                    </div>
+                    <ul class="task-list space-y-4 text-gray-700">
+                        ${dayData.tasks.map(task => `
+                            <li>
+                                <strong class="text-gray-800">${task.type}:</strong> ${task.description}
+                                <span class="german-translation">${task.german}</span>
+                                <p class="text-sm text-gray-500 italic mt-1">範例: ${task.example}</p>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+
+        // 單字卡 & 片語與慣用語
+        if ((dayData.supplementary.words && dayData.supplementary.words.length > 0) || (dayData.supplementary.phrases && dayData.supplementary.phrases.length > 0)) {
+            htmlContent += `
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+            `;
+            if (dayData.supplementary.words && dayData.supplementary.words.length > 0) {
+                htmlContent += `
+                    <div class="card bg-white p-6 border border-gray-200">
+                        <div class="section-header mb-4">
+                            <div class="icon-container icon-vocab">
+                                ${createIcon(iconPaths.vocab)}
+                            </div>
+                            <div>
+                                <p class="section-title">單字卡</p>
+                                <p class="section-subtitle">(Vokabelkarten)</p>
+                            </div>
+                        </div>
+                        <ul class="words-list space-y-3 text-gray-700">
+                            ${dayData.supplementary.words.map(word => `
+                                <li>
+                                    <strong class="text-gray-800">${word.word}</strong> (${word.partOfSpeech}) - ${word.meaning}
+                                    <span class="block text-sm italic ml-4 text-gray-500">例句: ${word.example}</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+            if (dayData.supplementary.phrases && dayData.supplementary.phrases.length > 0) {
+                htmlContent += `
+                    <div class="card bg-white p-6 border border-gray-200">
+                        <div class="section-header mb-4">
+                            <div class="icon-container bg-purple-500">
+                                ${createIcon(iconPaths.phrases)}
+                            </div>
+                            <div>
+                                <p class="section-title">片語與慣用語</p>
+                                <p class="section-subtitle">(Redewendungen)</p>
+                            </div>
+                        </div>
+                        <ul class="words-list space-y-3 text-gray-700">
+                            ${dayData.supplementary.phrases.map(phrase => `
+                                <li>
+                                    <strong class="text-gray-800">${phrase.phrase}</strong> (${phrase.type}) - ${phrase.meaning}
+                                    <span class="block text-sm italic ml-4 text-gray-500">例句: ${phrase.example}</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+            htmlContent += `</div>`;
+        }
+
+        // 練習題
+        if (dayData.supplementary.exercises && dayData.supplementary.exercises.length > 0) {
+            htmlContent += `
+                <div class="card bg-white p-6 md:p-8 mb-6 border border-gray-200">
+                    <div class="section-header mb-4">
+                        <div class="icon-container bg-teal-500">
+                            ${createIcon(iconPaths.exercises)}
+                        </div>
+                        <div>
+                            <p class="section-title">練習題</p>
+                            <p class="section-subtitle">(Übungsaufgaben)</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        ${dayData.supplementary.exercises.map((exercise, idx) => `
+                            <div class="bg-gray-50 p-4 rounded-lg shadow-sm border border-gray-200">
+                                <p class="font-medium text-gray-800">${idx + 1}. ${exercise.question}</p>
+                                <span class="german-translation">${exercise.german}</span>
+                                <p class="text-sm text-gray-500 italic mt-1">題型: ${exercise.type} / 能力指標: ${exercise.skill}</p>
+                                <div id="answer-${dayIndex}-${idx}" class="answer-container mt-2">
+                                    <strong class="text-sm text-gray-700">答案:</strong>
+                                    <span class="answer-text">${exercise.answer}</span>
+                                    <span class="answer-german">${exercise.germanAnswer}</span>
+                                </div>
+                                <button class="show-answer-btn mt-2 text-sm" onclick="toggleAnswer(${dayIndex}, ${idx})">顯示參考答案</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // 總結摘要 (如果有的話)
+        if (dayData.supplementary.summary) {
+            htmlContent += dayData.supplementary.summary;
+        }
+
+        container.innerHTML = htmlContent;
+
+        // 更新按鈕狀態
+        dayButtons.forEach((btn, index) => {
+            if (index === dayIndex) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+    };
+
+    // 顯示/隱藏答案的函數
+    window.toggleAnswer = (dayIndex, exerciseIndex) => {
+        const answerContainer = document.getElementById(`answer-${dayIndex}-${exerciseIndex}`);
+        const button = event.target;
+        if (answerContainer.style.display === 'block') {
+            answerContainer.style.display = 'none';
+            button.textContent = '顯示參考答案';
+        } else {
+            answerContainer.style.display = 'block';
+            button.textContent = '隱藏參考答案';
+        }
+    };
+    
+    // 初始化，渲染第一天的內容
+    window.onload = () => {
+        renderDay(currentDayIndex);
+        dayButtons.forEach((btn, index) => {
+            btn.addEventListener('click', () => {
+                currentDayIndex = index;
+                renderDay(currentDayIndex);
+            });
+        });
+    };
+</script>
+
+</body>
+</html>
